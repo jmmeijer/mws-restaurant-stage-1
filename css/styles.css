@@ -154,7 +154,7 @@ nav h1 a {
 }
 #restaurants-list li {
   background-color: #fff;
-  border: 2px solid #ccc;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
   font-family: Arial,sans-serif;
   margin: 15px;
   min-height: 380px;
@@ -186,7 +186,7 @@ nav h1 a {
 }
 #restaurants-list li a {
   background-color: orange;
-  border-bottom: 3px solid #eee;
+  box-shadow:0 3px 6px rgba(0,0,0,0.1);
   color: #fff;
   display: inline-block;
   font-size: 10pt;
