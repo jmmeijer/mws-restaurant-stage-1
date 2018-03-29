@@ -17,6 +17,10 @@ ul, li {
 	font-size: 10pt;
 	color: #333;
 }
+img{
+    max-width:100%;
+    height:auto;
+}
 a {
 	color: orange;
 	text-decoration: none;
