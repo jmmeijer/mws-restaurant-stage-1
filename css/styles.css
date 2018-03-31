@@ -190,6 +190,11 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
 }
+#restaurants-list li a:hover,
+#restaurants-list li a:focus{
+    background-color: #664200;
+    box-shadow:0 3px 6px rgba(0,0,0,0.2);
+}
 
 /* ====================== Restaurant Details ====================== */
 .inside header {
