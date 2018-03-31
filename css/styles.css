@@ -269,7 +269,7 @@ nav h1 a {
 }
 #reviews-list li {
   background-color: #fff;
-    border: 2px solid #f3f3f3;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
   display: block;
   list-style-type: none;
   margin: 0 0 30px;
