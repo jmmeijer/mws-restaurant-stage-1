@@ -138,6 +138,10 @@ nav h1 a {
   padding: 0 10px;
   width: 200px;
 }
+.filter-options select:focus{
+    outline:none;
+    box-shadow:0 0 10px #fff;
+}
 
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
