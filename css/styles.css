@@ -197,6 +197,9 @@ nav h1 a {
 }
 
 /* ====================== Restaurant Details ====================== */
+.inside #maincontent{
+    padding-top: 131px;
+}
 .inside header {
   position: fixed;
   top: 0;
@@ -205,7 +208,6 @@ nav h1 a {
 }
 .inside #map-container {
   background: blue none repeat scroll 0 0;
-  padding-top: 111px;
   height: 400px;
 }
 .inside #map {
@@ -282,6 +284,14 @@ nav h1 a {
   color: #666;
 }
 
+@media only screen and (min-width:396px){
+    
+    .inside #maincontent{
+        padding-top:91px;
+    }
+    
+}
+
 @media only screen and (min-width:480px){
     
     #restaurants-list li {
@@ -296,15 +306,20 @@ nav h1 a {
         width: 50%;
     }
     
+    .inside #maincontent{
+        padding-top: 0;
+    }
+    
     #restaurants-list li {
       width: calc(33% - 30px);
     }
     
     .inside #map-container {
-      height: 87%;
+      height: 100%;
       position: fixed;
       right: 0;
-      top: 80px;
+      top:0;
+      padding-top: 39px;
       width: 50%;
     }
     #restaurant-container, #reviews-container {
