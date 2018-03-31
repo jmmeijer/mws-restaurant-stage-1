@@ -29,8 +29,8 @@
         <select id="neighborhoods-select" name="neighborhoods" aria-labelledby="neighborhoods-label" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
-        <label hidden for="cuisines-select">Filter cuisines</label>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+        <label hidden id="cuisines-label" for="cuisines-select">Filter cuisines</label>
+        <select id="cuisines-select" name="cuisines" aria-labelledby="cuisines-label" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
         </fieldset>
