@@ -182,7 +182,7 @@ nav h1 a {
   margin: 0;
   font-size: 11pt;
 }
-#restaurants-list li a {
+a.button {
   background-color: #7f5200;
   box-shadow:0 3px 6px rgba(0,0,0,0.1);
   color: #fff;
@@ -194,8 +194,8 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
 }
-#restaurants-list li a:hover,
-#restaurants-list li a:focus{
+a.button:hover,
+a.button:focus{
     background-color: #664200;
     box-shadow:0 3px 6px rgba(0,0,0,0.2);
 }
