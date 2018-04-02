@@ -100,10 +100,24 @@ updateRestaurants = () => {
     if (error) { // Got an error!
       console.error(error);
     } else {
+      console.log(restaurants);
+      if(restaurants.length == 0){
+        notify("No restaurants found.");
+      }else{
+        notify(restaurants.length +" restaurants found.");
+      }
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
     }
   })
+}
+
+/*
+* Notification
+*/
+notify = (notification) => {
+    const div = document.getElementById('notification');
+    div.innerHTML = notification;
 }
 
 /**
@@ -146,6 +160,7 @@ createRestaurantHTML = (restaurant) => {
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
+  name.tabIndex = 0;
   li.append(name);
 
   const neighborhood = document.createElement('p');
