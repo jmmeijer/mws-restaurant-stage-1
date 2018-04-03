@@ -178,8 +178,14 @@ createRestaurantHTML = (restaurant) => {
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
   li.append(address);
+    
+  const more = document.createElement('a');	
+  more.className = 'button';
+  more.innerHTML = 'View Details';	
+  more.href = DBHelper.urlForRestaurant(restaurant);
+  li.append(more);
 
-  return li
+  return li;
 }
 
 /**
