@@ -3,7 +3,8 @@ import idb from 'idb';
 var dbPromise = idb.open('restaurants-db', 1, function(upgradeDb) {
   switch(upgradeDb.oldVersion) {
     case 0:
-      upgradeDb.createObjectStore('restaurants');
+      upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+      
   }
 });
 
