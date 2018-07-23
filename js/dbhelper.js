@@ -4,7 +4,8 @@ var dbPromise = idb.open('restaurants', 1, function(upgradeDb) {
   switch(upgradeDb.oldVersion) {
     case 0:
       upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-      
+      restaurants.createIndex('cuisine', 'cuisine_type')
+      restaurants.createIndex('neighborhood', 'neighborhood')
   }
 });
 
