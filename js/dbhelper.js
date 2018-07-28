@@ -1,5 +1,4 @@
-import idb from 'idb';
-
+idb = indexedDB;
 var dbPromise = idb.open('restaurants', 1, function(upgradeDb) {
   switch(upgradeDb.oldVersion) {
     case 0:
@@ -22,25 +21,45 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants/`;
   }
+    
+    /*
+    * https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+    */
+    
+    static status(response) {
+      if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response)
+      } else {
+        return Promise.reject(new Error(response.statusText))
+      }
+    }
+
+    static json(response) {
+      return response.json()
+    }
+
+    static requestError(e, part) {
+        console.log('Request failed', e);
+    }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    return fetch(DBHelper.DATABASE_URL)
+        .then(DBHelper.status)
+        .then(DBHelper.json)
+        .then(function(data) {
+            console.log('Request succeeded with JSON response', data);
+            const restaurants = data;
+        // Temporarily use callback for backwards compatibility
+            callback(null, restaurants);
+        //TODO: Add to IndexedDB storage
+        })
+        .catch(err => DBHelper.requestError(err));
   }
+    
+
 
   /**
    * Fetch a restaurant by its ID.
