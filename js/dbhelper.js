@@ -1,17 +1,18 @@
-idb = indexedDB;
-var dbPromise = idb.open('restaurants', 1, function(upgradeDb) {
-  switch(upgradeDb.oldVersion) {
-    case 0:
-      upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-      restaurants.createIndex('cuisine', 'cuisine_type')
-      restaurants.createIndex('neighborhood', 'neighborhood')
-  }
-});
-
 /**
  * Common database helper functions.
  */
 class DBHelper {
+    
+    idb = indexedDB;
+
+    var dbPromise = idb.open('restaurants', 1, function(upgradeDb) {
+      switch(upgradeDb.oldVersion) {
+        case 0:
+          upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+          restaurants.createIndex('cuisine', 'cuisine_type')
+          restaurants.createIndex('neighborhood', 'neighborhood')
+      }
+    });
 
   /**
    * Database URL.
