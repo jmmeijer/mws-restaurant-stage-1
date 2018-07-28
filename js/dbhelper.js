@@ -1,18 +1,17 @@
+const dbPromise = idb.open('restaurants', 1, upgradeDb => {
+  switch(upgradeDb.oldVersion) {
+    case 0:
+      var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+      store.createIndex('cuisine', 'cuisine_type')
+      store.createIndex('neighborhood', 'neighborhood')
+  }
+}).then(db => console.log("DB opened!", db));
 /**
  * Common database helper functions.
  */
 class DBHelper {
-    
-    idb = indexedDB;
 
-    var dbPromise = idb.open('restaurants', 1, function(upgradeDb) {
-      switch(upgradeDb.oldVersion) {
-        case 0:
-          upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-          restaurants.createIndex('cuisine', 'cuisine_type')
-          restaurants.createIndex('neighborhood', 'neighborhood')
-      }
-    });
+
 
   /**
    * Database URL.
@@ -53,9 +52,19 @@ class DBHelper {
         .then(function(data) {
             console.log('Request succeeded with JSON response', data);
             const restaurants = data;
+
+        //Add to IndexedDB storage
+        dbPromise.then( db => {
+          if(!db) return;
+          const tx = db.transaction('restaurants', 'readwrite');
+          const store = tx.objectStore('restaurants');
+          restaurants.forEach(function(restaurant) {
+            store.put(restaurant);
+          });
+        });
+        
         // Temporarily use callback for backwards compatibility
             callback(null, restaurants);
-        //TODO: Add to IndexedDB storage
         })
         .catch(err => DBHelper.requestError(err));
   }
