@@ -1,16 +1,26 @@
-const dbPromise = idb.open('restaurants', 1, upgradeDb => {
-  switch(upgradeDb.oldVersion) {
-    case 0:
-      var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-      store.createIndex('cuisine', 'cuisine_type')
-      store.createIndex('neighborhood', 'neighborhood')
-  }
-}).then(db => console.log("DB opened!", db));
+'use strict';
+
+
+
 /**
  * Common database helper functions.
  */
 class DBHelper {
+    
+    static get dbPromise() {
+      if (!navigator.serviceWorker) {
+        return Promise.resolve();
+      }
 
+      return idb.open('restaurants', 1, upgradeDb => {
+          switch(upgradeDb.oldVersion) {
+            case 0:
+              var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+              store.createIndex('cuisine', 'cuisine_type')
+              store.createIndex('neighborhood', 'neighborhood');
+          }
+        });
+    }
 
 
   /**
@@ -52,15 +62,23 @@ class DBHelper {
         .then(function(data) {
             console.log('Request succeeded with JSON response', data);
             const restaurants = data;
+            console.log('Restaurants: ', restaurants);
 
         //Add to IndexedDB storage
-        dbPromise.then( db => {
-          if(!db) return;
+        DBHelper.dbPromise.then( db => {
+          if(!db) { 
+            return;
+            console.log('No DB found!');
+          }else{
+            console.log('DB found!');
+          }
           const tx = db.transaction('restaurants', 'readwrite');
           const store = tx.objectStore('restaurants');
-          restaurants.forEach(function(restaurant) {
-            store.put(restaurant);
-          });
+            
+          data.map(
+            restaurant => store.put(restaurant)
+          );
+            
         });
         
         // Temporarily use callback for backwards compatibility
@@ -214,17 +232,7 @@ class DBHelper {
       })
       marker.addTo(newMap);
     return marker;
-  } 
-  /* static mapMarkerForRestaurant(restaurant, map) {
-    const marker = new google.maps.Marker({
-      position: restaurant.latlng,
-      title: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant),
-      map: map,
-      animation: google.maps.Animation.DROP}
-    );
-    return marker;
-  } */
+  }
 
 }
 
