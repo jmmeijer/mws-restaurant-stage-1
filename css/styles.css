@@ -284,6 +284,12 @@ a.button:focus{
   color: #666;
 }
 
+/* ====================== Map overrides ====================== */
+
+.leaflet-container .leaflet-control-attribution{
+    background: #fff;
+}
+
 @media only screen and (min-width:396px){
     
     .inside #maincontent{
