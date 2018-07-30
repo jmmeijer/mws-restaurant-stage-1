@@ -235,7 +235,7 @@ class DBHelper {
           return (`/img/${restaurant.photograph}.jpg`);
       }
       else{
-           return (`http://via.placeholder.com/800x600`);
+           return (`https://via.placeholder.com/800x600`);
       }
   }
     
