@@ -229,7 +229,12 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}.jpg`);
+      if(typeof restaurant.photograph != 'undefined'){
+          return (`/img/${restaurant.photograph}.jpg`);
+      }
+      else{
+           return (`http://via.placeholder.com/800x600`);
+      }
   }
     
   /**
