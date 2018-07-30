@@ -57,7 +57,7 @@ class DBHelper {
    */
   static fetchRestaurants(callback) {
 
-    // First get cached data from IndexedDB
+    // First try to get cached data from IndexedDB
     DBHelper.dbPromise.then( db => {
       if(!db) { 
         return;
@@ -72,14 +72,16 @@ class DBHelper {
       return restaurants.getAll();
 
     }).then( restaurants => {
-          callback(null, restaurants);
+        if(restaurants.length > 0){
+            callback(null, restaurants);
+        }
     });
       
     // After that get online data and put in IndexedDB
     return fetch(DBHelper.DATABASE_URL)
         .then(DBHelper.status)
         .then(DBHelper.json)
-        .then(function(data) {
+        .then(data => {
             console.log('Request succeeded with JSON response', data);
             const restaurants = data;
             console.log('Restaurants: ', restaurants);

@@ -39,7 +39,12 @@ self.addEventListener('fetch', function (event) {
   }
 
   event.respondWith(caches.match(event.request).then(function (response) {
-    return response || fetch(event.request);
+    return response || fetch(event.request).then(function(response) {
+        return response;
+      }).catch(function(error) {
+        console.error('Fetching failed:', error);
+        throw error;
+      });
   }));
 });
 
@@ -53,6 +58,9 @@ function serveIMG(request) {
       return fetch(request).then(function (networkResponse) {
         cache.put(storageUrl, networkResponse.clone());
         return networkResponse;
+      }).catch(function(error) {
+        console.error('Fetching failed:', error);
+        throw error;
       });
     });
   });
