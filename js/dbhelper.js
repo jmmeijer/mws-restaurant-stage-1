@@ -56,6 +56,26 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
+
+    // First get cached data from IndexedDB
+    DBHelper.dbPromise.then( db => {
+      if(!db) { 
+        return;
+        console.log('No DB found!');
+      }else{
+        console.log('DB found!');
+      }
+
+      const restaurants = db.transaction('restaurants')
+        .objectStore('restaurants');
+      
+      return restaurants.getAll();
+
+    }).then( restaurants => {
+          callback(null, restaurants);
+    });
+      
+    // After that get online data and put in IndexedDB
     return fetch(DBHelper.DATABASE_URL)
         .then(DBHelper.status)
         .then(DBHelper.json)
@@ -72,6 +92,7 @@ class DBHelper {
           }else{
             console.log('DB found!');
           }
+            
           const tx = db.transaction('restaurants', 'readwrite');
           const store = tx.objectStore('restaurants');
             
@@ -81,7 +102,7 @@ class DBHelper {
             
         });
         
-        // Temporarily use callback for backwards compatibility
+        // Temporarily use callback for backwards compatibility, needs complete refactoring
             callback(null, restaurants);
         })
         .catch(err => DBHelper.requestError(err));
