@@ -36,6 +36,10 @@ self.addEventListener('fetch', function (event) {
       event.respondWith(serveIMG(event.request));
       return;
     }
+    if (requestUrl.pathname.startsWith('/restaurant.html')) {
+      event.respondWith(caches.match("/restaurant.html"));
+      return;
+    }
   }
 
   event.respondWith(caches.match(event.request, {ignoreSearch: true}).then(function (response) {
