@@ -168,6 +168,8 @@ createRestaurantHTML = (restaurant) => {
   image.className = 'restaurant-img';
   image.src = DBHelper.imageThumbUrlForRestaurant(restaurant);
   image.alt = "An image of " + restaurant.name;
+  image.width = '340';
+  image.height = '255';
   imageLink.append(image);
     
   const name = document.createElement('h1');
