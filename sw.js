@@ -2,6 +2,23 @@ var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
 var allCaches = [staticCacheName, contentImgsCache];
 
+function openDatabase() {
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+
+  return idb.open('restaurants', 1, upgradeDb => {
+      switch(upgradeDb.oldVersion) {
+        case 0:
+          var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+          store.createIndex('cuisine', 'cuisine_type')
+          store.createIndex('neighborhood', 'neighborhood');
+      }
+    });
+}
+
+const dbPromise = openDatabase();
+
 self.addEventListener('install', function (event) {
   event.waitUntil(caches.open(staticCacheName).then(function (cache) {
     return cache.addAll([
@@ -30,8 +47,8 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   var requestUrl = new URL(event.request.url);
-
   if (requestUrl.origin === location.origin) {
+    console.log('Not the same');
     if (requestUrl.pathname.startsWith('/img/')) {
       event.respondWith(serveIMG(event.request));
       return;
@@ -41,6 +58,13 @@ self.addEventListener('fetch', function (event) {
       return;
     }
   }
+   
+ if(requestUrl.href.startsWith('http://localhost:1337')){
+     console.log('Calling API');
+     event.respondWith(showCachedRestaurants(event.request));
+     return;
+ }
+
 
   event.respondWith(caches.match(event.request, {ignoreSearch: true}).then(function (response) {
     return response || fetch(event.request).then(function(response) {
@@ -51,6 +75,16 @@ self.addEventListener('fetch', function (event) {
       });
   }));
 });
+
+function showCachedRestaurants(request){
+    console.log(request);
+    
+    return fetch(request).catch(function(error) {
+        console.error('Fetching failed:', error);
+        throw error;
+      });
+    
+}
 
 function serveIMG(request) {
   var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');

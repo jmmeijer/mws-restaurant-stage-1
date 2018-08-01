@@ -58,6 +58,7 @@ class DBHelper {
   static fetchRestaurants(callback) {
 
     // First try to get cached data from IndexedDB
+    // TODO: move to service worker
     DBHelper.dbPromise.then( db => {
       if(!db) { 
         return;
@@ -105,6 +106,7 @@ class DBHelper {
         });
         
         // Temporarily use callback for backwards compatibility, needs complete refactoring
+        // TODO: either live or cached data
             callback(null, restaurants);
         })
         .catch(err => DBHelper.requestError(err));
@@ -232,10 +234,10 @@ class DBHelper {
    */
   static imageUrlForRestaurant(restaurant) {
       if(typeof restaurant.photograph != 'undefined'){
-          return (`/img/${restaurant.photograph}.jpg`);
+          return (`img/${restaurant.photograph}.jpg`);
       }
       else{
-           return (`https://via.placeholder.com/800x600`);
+           return (`img/${restaurant.id}.jpg`);
       }
   }
     
