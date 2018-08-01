@@ -70,46 +70,50 @@ class DBHelper {
       const restaurants = db.transaction('restaurants')
         .objectStore('restaurants');
       
+        
       return restaurants.getAll();
 
     }).then( restaurants => {
+        console.log(restaurants);
         if(restaurants.length > 0){
             callback(null, restaurants);
+        }else{
+            fetch(DBHelper.DATABASE_URL)
+            .then(DBHelper.status)
+            .then(DBHelper.json)
+            .then(data => {
+                console.log('Request succeeded with JSON response', data);
+                const restaurants = data;
+                console.log('Restaurants: ', restaurants);
+
+            //Add to IndexedDB storage
+            DBHelper.dbPromise.then( db => {
+              if(!db) { 
+                return;
+                console.log('No DB found!');
+              }else{
+                console.log('DB found!');
+              }
+
+              const tx = db.transaction('restaurants', 'readwrite');
+              const store = tx.objectStore('restaurants');
+
+              data.map(
+                restaurant => store.put(restaurant)
+              );
+
+            });
+
+            // Temporarily use callback for backwards compatibility, needs complete refactoring
+            // TODO: either live or cached data
+                callback(null, restaurants);
+            })
+            .catch(err => DBHelper.requestError(err));
         }
     });
       
     // After that get online data and put in IndexedDB
-    return fetch(DBHelper.DATABASE_URL)
-        .then(DBHelper.status)
-        .then(DBHelper.json)
-        .then(data => {
-            console.log('Request succeeded with JSON response', data);
-            const restaurants = data;
-            console.log('Restaurants: ', restaurants);
 
-        //Add to IndexedDB storage
-        DBHelper.dbPromise.then( db => {
-          if(!db) { 
-            return;
-            console.log('No DB found!');
-          }else{
-            console.log('DB found!');
-          }
-            
-          const tx = db.transaction('restaurants', 'readwrite');
-          const store = tx.objectStore('restaurants');
-            
-          data.map(
-            restaurant => store.put(restaurant)
-          );
-            
-        });
-        
-        // Temporarily use callback for backwards compatibility, needs complete refactoring
-        // TODO: either live or cached data
-            callback(null, restaurants);
-        })
-        .catch(err => DBHelper.requestError(err));
   }
     
 
