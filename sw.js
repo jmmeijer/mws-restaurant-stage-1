@@ -48,7 +48,6 @@ self.addEventListener('activate', function (event) {
 self.addEventListener('fetch', function (event) {
   var requestUrl = new URL(event.request.url);
   if (requestUrl.origin === location.origin) {
-    console.log('Not the same');
     if (requestUrl.pathname.startsWith('/img/')) {
       event.respondWith(serveIMG(event.request));
       return;
