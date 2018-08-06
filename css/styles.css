@@ -287,6 +287,16 @@ a.button:focus{
   color: #666;
 }
 
+/* ====================== Review Form ====================== */
+
+#review-form{
+    
+}
+#review-form input[type="text"],
+#review-form textarea{
+    width:100%;
+}
+
 /* ====================== Map overrides ====================== */
 
 .leaflet-container .leaflet-control-attribution{
