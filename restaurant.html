@@ -34,6 +34,38 @@
     </section>
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
+      <!-- Accessible star rating -->
+      <form id="review-form" action="" method="post">
+         <fieldset>
+             <legend>Your Review</legend>
+         
+          <label for="name">Name</label>
+          <input type="text" name="name" id="name">
+          
+          <p>Rating</p>
+          <label for="star1">Star 1</label>
+          <input type="radio" name="rating" id="star1" value="1">
+          
+          <label for="star2">Star 2</label>
+          <input type="radio" name="rating" id="star2" value="2">
+          
+          <label for="star3">Star 3</label>
+          <input type="radio" name="rating" id="star3" value="3">
+          
+          <label for="star4">Star 4</label>
+          <input type="radio" name="rating" id="star4" value="4">
+          
+          <label for="star5">Star 5</label>
+          <input type="radio" name="rating" id="star5" value="5">
+          
+          <label for="comments">Comments</label>
+          <textarea name="comments"></textarea>
+          
+          
+          <input type="submit" value="Submit">
+          </fieldset>
+      </form>
+      
     </section>
   </main>
   <footer id="footer">
