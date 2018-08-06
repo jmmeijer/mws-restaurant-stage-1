@@ -12,12 +12,15 @@ class DBHelper {
         return Promise.resolve();
       }
 
-      return idb.open('restaurants', 1, upgradeDb => {
+      return idb.open('restaurants', 2, upgradeDb => {
           switch(upgradeDb.oldVersion) {
             case 0:
               var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
               store.createIndex('cuisine', 'cuisine_type')
               store.createIndex('neighborhood', 'neighborhood');
+            case 1:
+              var store = upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+              store.createIndex('restaurant', 'restaurant_id')
           }
         });
     }
