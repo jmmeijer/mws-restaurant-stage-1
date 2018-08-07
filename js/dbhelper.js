@@ -138,6 +138,9 @@ class DBHelper {
         }
       }
     });
+      
+      
+      
   }
 
   /**
@@ -274,11 +277,11 @@ class DBHelper {
   /**
    * Fetch all reviews.
    */
-  static fetchReviews(callback) {
+  static fetchReviews() {
 
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
-    DBHelper.dbPromise.then( db => {
+    return DBHelper.dbPromise.then( db => {
       if(!db) { 
         return;
         console.log('No DB found!');
@@ -293,16 +296,16 @@ class DBHelper {
       return reviews.getAll();
 
     }).then( reviews => {
-        console.log(reviews);
-        if(restaurants.length > 0){
-            callback(null, reviews);
+        console.log('Reviews', reviews);
+        if(reviews.length > 0){
+            return reviews;
         }else{
             fetch(DBHelper.DATABASE_URL+'reviews')
             .then(DBHelper.status)
             .then(DBHelper.json)
             .then(data => {
                 console.log('Request succeeded with JSON response', data);
-                const restaurants = data;
+                const reviews = data;
                 console.log('Reviews: ', reviews);
 
             //Add to IndexedDB storage
@@ -323,9 +326,8 @@ class DBHelper {
 
             });
 
-            // Temporarily use callback for backwards compatibility, needs complete refactoring
             // TODO: either live or cached data
-                callback(null, reviews);
+                return reviews;
             })
             .catch(err => DBHelper.requestError(err));
         }
@@ -338,18 +340,18 @@ class DBHelper {
   /**
    * Fetch reviews by restaurant id with proper error handling.
    */
-  static fetchReviewsByRestaurant(restaurant, callback) {
-    // Fetch all restaurants  with proper error handling
-    DBHelper.fetchReviews((error, reviews) => {
-      if (error) {
-        callback(error, null);
-      } else {
+  static fetchReviewsByRestaurant(restaurant) {
+    
+    console.log(restaurant);
+    
+    return DBHelper.fetchReviews()
+    .then( reviews => {
         // Filter restaurants to have only given cuisine type
         const results = reviews.filter(r => r.restaurant_id == restaurant);
-        callback(null, results);
-      }
-    });
+        return results;
+    })
+    .catch(err => DBHelper.requestError(err));
+      
   }
-
 }
 
