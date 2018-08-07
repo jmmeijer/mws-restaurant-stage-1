@@ -56,7 +56,16 @@ fetchRestaurantFromURL = (callback) => {
       }
       fillRestaurantHTML();
       callback(null, restaurant);
-        return restaurant;
+        
+        //TODO: just for now, improve this later!
+        DBHelper.fetchReviewsByRestaurant(restaurant.id).then(reviews => {
+            
+            self.restaurant.reviews = reviews;
+            fillReviewsHTML();
+        })
+        .catch(err => DBHelper.requestError(err));
+        
+        
     });
   }
 }
