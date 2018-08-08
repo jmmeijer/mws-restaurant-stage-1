@@ -6,6 +6,7 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
+  initForm(); 
 });
 
 /**
@@ -33,6 +34,13 @@ initMap = () => {
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
+}
+
+initForm = () => {
+    document.getElementById('review-form').addEventListener('submit', (event) => {
+        // TODO: disable fieldset on submit
+        // TODO: get form data
+    });
 }
 
 /**
