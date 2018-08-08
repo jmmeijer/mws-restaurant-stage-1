@@ -159,7 +159,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = getDateFromTimestamp(review.createdAt);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -197,4 +197,18 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+/** 
+ * Get Date from Timestamp: October 26, 2016
+ */
+getDateFromTimestamp = (timestamp) => {
+  datetime = new Date(timestamp);
+    
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const year = datetime.getFullYear();
+  const month = months[datetime.getMonth()];
+  const date = datetime.getDate();
+    
+  return `${month} ${date}, ${year}`;
 }
