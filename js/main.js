@@ -180,6 +180,16 @@ createRestaurantHTML = (restaurant) => {
   nameLink.innerHTML = restaurant.name;
   nameLink.href = DBHelper.urlForRestaurant(restaurant);
   name.append(nameLink);
+    
+    const favoriteButton = document.createElement('button');
+    favoriteButton.classList.add('add-to-favorites');
+    //favoriteButton.addEventListener('click', toggleFavorite, false);
+    
+    const favoriteLabel = document.createElement('span');
+    favoriteLabel.classList.add('label');
+    favoriteLabel.innerHTML = 'Add to favorites';
+    favoriteButton.append(favoriteLabel);
+    li.append(favoriteButton);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
