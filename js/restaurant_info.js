@@ -42,22 +42,29 @@ initMap = () => {
 initForm = () => {
 
     const form = document.getElementById('review-form');
+    
     form.addEventListener('submit', (event) => {
         
         // Don't submit just yet
         event.preventDefault();
         
+        const review = {};
+        // Get form data
+        const data = new FormData(form);
+        data.forEach(function(value, key){
+            review[key] = value;
+        });
+        const json = JSON.stringify(review);
+        
         // Disable form via fieldset while handling form data async
         const fieldset = form.querySelector('fieldset');
         fieldset.disabled = true;
         
-        // Get form data
-        const data = new FormData(form);
-
         console.log(data);
+        console.log(json);
         
         alert('submitting form');
-    });
+    }, false);
 }
 initFavorite = () => {
 
@@ -242,7 +249,7 @@ getDateFromTimestamp = (timestamp) => {
   return `${month} ${date}, ${year}`;
 }
 
-function toggleFavorite() {
+toggleFavorite = () => {
     //var element = document.getElementById("myDIV");
     var state = self.restaurant.is_favorite;
     console.log(state);
