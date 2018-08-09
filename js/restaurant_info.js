@@ -6,8 +6,6 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
-  initForm();
-    
 });
 
 /**
@@ -33,8 +31,6 @@ initMap = () => {
       }).addTo(newMap);
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
-        
-        initFavorite();
     }
   });
 }
@@ -66,15 +62,18 @@ initForm = () => {
         alert('submitting form');
     }, false);
 }
-initFavorite = () => {
+initFavorite = (restaurant = self.restaurant) => {
 
     const favorite = document.getElementById('add-to-favorites');
     
-    if(self.restaurant.is_favorite === true){
+    if(restaurant.is_favorite === true){
         favorite.classList.toggle("favorite");
     }
     
-    favorite.addEventListener('click', toggleFavorite, false);
+    favorite.addEventListener('click', ()=>{
+        toggleFavorite(restaurant);
+        favorite.classList.toggle("favorite");
+    }, false);
 }
 
 
@@ -140,6 +139,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // fill reviews
   //fillReviewsHTML();
+  initFavorite();
+  initForm();
 }
 
 /**
@@ -249,15 +250,15 @@ getDateFromTimestamp = (timestamp) => {
   return `${month} ${date}, ${year}`;
 }
 
-toggleFavorite = () => {
+toggleFavorite = (restaurant) => {
     //var element = document.getElementById("myDIV");
-    var state = self.restaurant.is_favorite;
+    var state = restaurant.is_favorite;
     console.log(state);
     
-    DBHelper.setFavorite(self.restaurant.id, !state)
+    DBHelper.setFavorite(restaurant.id, !state)
     .then( () => {
         self.restaurant.is_favorite = !state;
-        this.classList.toggle("favorite"); // TODO: bind class with data?
+        //this.classList.toggle("favorite"); // TODO: bind class with data?
     });
 
 }
