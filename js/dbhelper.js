@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 /**
  * Common database helper functions.
  */
@@ -353,5 +351,37 @@ class DBHelper {
     .catch(err => DBHelper.requestError(err));
       
   }
+    
+  static setFavorite(restaurant_id, is_favorite){
+      return fetch(DBHelper.DATABASE_URL+'restaurants/'+restaurant_id+'/?is_favorite='+is_favorite,
+           {
+          method: "PUT"
+      })
+      .then(DBHelper.status)
+      .then(DBHelper.json)
+      .then(data => {
+            //Add to IndexedDB storage
+            DBHelper.dbPromise.then( db => {
+              if(!db) { 
+                return;
+                console.log('No DB found!');
+              }else{
+                console.log('DB found!');
+              }
+
+              const tx = db.transaction('restaurants', 'readwrite');
+              const store = tx.objectStore('restaurants');
+                
+              store.get(restaurant_id)
+              .then(restaurant => {
+                  restaurant.is_favorite = is_favorite;
+                  store.put(restaurant);
+              })
+
+            });
+      })
+      .catch(err => DBHelper.requestError(err));
+  }
+    
 }
 

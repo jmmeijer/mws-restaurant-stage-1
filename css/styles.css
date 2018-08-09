@@ -197,6 +197,9 @@ nav h1 a {
   text-transform: uppercase;
   border:none;
 }
+a.button{
+    color: #fff;
+}
 .button:hover,
 .button:focus{
     background-color: #664200;
@@ -304,13 +307,20 @@ button{
 
 @keyframes growHeart {
     from {background-size:0% auto;}
-    to {background:100% auto;}
+    to {background-size:100% auto;}
+}
+@keyframes shrinkHeart {
+    from {background-size:100% auto;}
+    to {background-size:50% auto;}
 }
 
-#add-to-favorites{
+.add-to-favorites{
     line-height: 24px;
 }
-#add-to-favorites::before{
+.add-to-favorites:hover{
+    color:#333;
+}
+.add-to-favorites::before{
     /*content:"\2661";*/
     content:"";
     background:url("../icon/if_like_outline.svg") no-repeat center;
@@ -325,9 +335,17 @@ button{
     transition: background 0.5s;
     background-size:100% auto; 
 }
-#add-to-favorites.favorite::before{
+.add-to-favorites:hover::before{
+    animation: shrinkHeart 0.5s;
+    background-size:50% auto;
+}
+.add-to-favorites.favorite::before{
     background-image:url("../icon/if_like.svg");
     animation: growHeart 0.5s;
+}
+.add-to-favorites.favorite:hover::before{
+    animation: shrinkHeart 0.5s;
+    background-size:50% auto;
 }
 
 /* ====================== Review Form ====================== */

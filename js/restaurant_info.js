@@ -7,7 +7,7 @@ var newMap;
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
   initForm();
-    initFavorite();
+    
 });
 
 /**
@@ -33,6 +33,8 @@ initMap = () => {
       }).addTo(newMap);
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
+        
+        initFavorite();
     }
   });
 }
@@ -60,6 +62,11 @@ initForm = () => {
 initFavorite = () => {
 
     const favorite = document.getElementById('add-to-favorites');
+    
+    if(self.restaurant.is_favorite === true){
+        favorite.classList.toggle("favorite");
+    }
+    
     favorite.addEventListener('click', toggleFavorite, false);
 }
 
@@ -237,5 +244,13 @@ getDateFromTimestamp = (timestamp) => {
 
 function toggleFavorite() {
     //var element = document.getElementById("myDIV");
-    this.classList.toggle("favorite");
+    var state = self.restaurant.is_favorite;
+    console.log(state);
+    
+    DBHelper.setFavorite(self.restaurant.id, !state)
+    .then( () => {
+        self.restaurant.is_favorite = !state;
+        this.classList.toggle("favorite"); // TODO: bind class with data?
+    });
+
 }
