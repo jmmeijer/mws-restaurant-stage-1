@@ -6,7 +6,8 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
-  initForm(); 
+  initForm();
+    initFavorite();
 });
 
 /**
@@ -37,11 +38,32 @@ initMap = () => {
 }
 
 initForm = () => {
-    document.getElementById('review-form').addEventListener('submit', (event) => {
-        // TODO: disable fieldset on submit
-        // TODO: get form data
+
+    const form = document.getElementById('review-form');
+    form.addEventListener('submit', (event) => {
+        
+        // Don't submit just yet
+        event.preventDefault();
+        
+        // Disable form via fieldset while handling form data async
+        const fieldset = form.querySelector('fieldset');
+        fieldset.disabled = true;
+        
+        // Get form data
+        const data = new FormData(form);
+
+        console.log(data);
+        
+        alert('submitting form');
     });
 }
+initFavorite = () => {
+
+    const favorite = document.getElementById('add-to-favorites');
+    favorite.addEventListener('click', toggleFavorite, false);
+}
+
+
 
 /**
  * Get current restaurant from page URL.
@@ -211,4 +233,9 @@ getDateFromTimestamp = (timestamp) => {
   const date = datetime.getDate();
     
   return `${month} ${date}, ${year}`;
+}
+
+function toggleFavorite() {
+    //var element = document.getElementById("myDIV");
+    this.classList.toggle("favorite");
 }

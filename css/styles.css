@@ -184,7 +184,7 @@ nav h1 a {
   margin: 0;
   font-size: 11pt;
 }
-a.button {
+.button {
   background-color: #7f5200;
   box-shadow:0 3px 6px rgba(0,0,0,0.1);
   color: #fff;
@@ -195,9 +195,10 @@ a.button {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+  border:none;
 }
-a.button:hover,
-a.button:focus{
+.button:hover,
+.button:focus{
     background-color: #664200;
     box-shadow:0 3px 6px rgba(0,0,0,0.2);
 }
@@ -288,6 +289,45 @@ a.button:focus{
 }
 #restaurant-hours td {
   color: #666;
+}
+
+/*  */
+button{
+  font-size: 10pt;
+  padding: 8px 30px 10px;
+  text-align: center;
+  text-decoration: none;
+  border:none;
+  background:none;
+}
+
+
+@keyframes growHeart {
+    from {background-size:0% auto;}
+    to {background:100% auto;}
+}
+
+#add-to-favorites{
+    line-height: 24px;
+}
+#add-to-favorites::before{
+    /*content:"\2661";*/
+    content:"";
+    background:url("../icon/if_like_outline.svg") no-repeat center;
+    color:#f00;
+    display:inline-block;
+    width:24px;
+    height:24px;
+    font-size:20pt;
+    vertical-align: bottom;
+    line-height: 24px;
+    margin-right:4px;
+    transition: background 0.5s;
+    background-size:100% auto; 
+}
+#add-to-favorites.favorite::before{
+    background-image:url("../icon/if_like.svg");
+    animation: growHeart 0.5s;
 }
 
 /* ====================== Review Form ====================== */
