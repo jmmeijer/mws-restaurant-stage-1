@@ -25,7 +25,7 @@
     </section>
     <section id="restaurant-container">
       <h1 id="restaurant-name"></h1>
-      <button id="add-to-favorites" class=""><span class="label">Add to favorites</span></button>
+      <button id="add-to-favorites" class="add-to-favorites"><span class="label">Add to favorites</span></button>
       <img id="restaurant-img" src="" alt="">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
@@ -38,8 +38,10 @@
       <!-- Accessible star rating -->
       <form id="review-form" action="" method="post">
          <fieldset>
-             <legend>Your Review</legend>
+          <legend>Your Review</legend>
          
+          <input type="hidden" name="restaurant_id" id="restaurant_id" value="" required>
+          
           <label for="name">Name</label>
           <input type="text" name="name" id="name" required>
           
