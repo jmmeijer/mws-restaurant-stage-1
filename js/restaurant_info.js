@@ -35,9 +35,10 @@ initMap = () => {
   });
 }
 
-initForm = () => {
+initForm = (restaurant = self.restaurant) => {
 
     const form = document.getElementById('review-form');
+    document.getElementById('restaurant_id').value = restaurant.id;
     
     form.addEventListener('submit', (event) => {
         
