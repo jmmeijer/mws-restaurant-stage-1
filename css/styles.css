@@ -170,6 +170,14 @@ nav h1 a {
   margin: 0;
   min-width: 100%;
 }
+#restaurants-list .add-to-favorites{
+    float:right;
+    margin-top:16px;
+    padding:3px;
+}
+#restaurants-list .add-to-favorites .label{
+    display:none;
+}
 #restaurants-list li h1 {
   color: #7f5200;
   font-family: Arial,sans-serif;
@@ -331,7 +339,6 @@ button{
     font-size:20pt;
     vertical-align: bottom;
     line-height: 24px;
-    margin-right:4px;
     transition: background 0.5s;
     background-size:100% auto; 
 }
@@ -346,6 +353,9 @@ button{
 .add-to-favorites.favorite:hover::before{
     animation: shrinkHeart 0.5s;
     background-size:50% auto;
+}
+.add-to-favorites .label{
+    margin-left:6px;
 }
 
 /* ====================== Review Form ====================== */

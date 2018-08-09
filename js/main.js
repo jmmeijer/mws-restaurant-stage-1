@@ -172,15 +172,6 @@ createRestaurantHTML = (restaurant) => {
   image.height = '255';
   imageLink.append(image);
     
-  const name = document.createElement('h1');
-  name.tabIndex = 0;
-  li.append(name);
-
-  const nameLink = document.createElement('a');
-  nameLink.innerHTML = restaurant.name;
-  nameLink.href = DBHelper.urlForRestaurant(restaurant);
-  name.append(nameLink);
-    
     const favoriteButton = document.createElement('button');
     favoriteButton.classList.add('add-to-favorites');
     //favoriteButton.addEventListener('click', toggleFavorite, false);
@@ -190,6 +181,15 @@ createRestaurantHTML = (restaurant) => {
     favoriteLabel.innerHTML = 'Add to favorites';
     favoriteButton.append(favoriteLabel);
     li.append(favoriteButton);
+    
+  const name = document.createElement('h1');
+  name.tabIndex = 0;
+  li.append(name);
+
+  const nameLink = document.createElement('a');
+  nameLink.innerHTML = restaurant.name;
+  nameLink.href = DBHelper.urlForRestaurant(restaurant);
+  name.append(nameLink);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
