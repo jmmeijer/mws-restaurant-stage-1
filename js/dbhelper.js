@@ -56,11 +56,11 @@ class DBHelper {
   /**
    * Fetch all restaurants.
    */
-  static fetchRestaurants(callback) {
+  static async fetchRestaurants(callback) {
 
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
-    DBHelper.dbPromise.then( db => {
+    return await DBHelper.dbPromise.then( db => {
       if(!db) { 
         return;
         console.log('No DB found!');
@@ -77,7 +77,8 @@ class DBHelper {
     }).then( restaurants => {
         console.log(restaurants);
         if(restaurants.length > 0){
-            callback(null, restaurants);
+            //callback(null, restaurants);
+            return restaurants;
         }else{
             fetch(DBHelper.DATABASE_URL+'restaurants')
             .then(DBHelper.status)
@@ -107,7 +108,8 @@ class DBHelper {
 
             // Temporarily use callback for backwards compatibility, needs complete refactoring
             // TODO: either live or cached data
-                callback(null, restaurants);
+                //callback(null, restaurants);
+                return restaurants;
             })
             .catch(err => DBHelper.requestError(err));
         }
@@ -122,23 +124,14 @@ class DBHelper {
   /**
    * Fetch a restaurant by its ID.
    */
-  static fetchRestaurantById(id, callback) {
+  static async fetchRestaurantById(id) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
+    return await DBHelper.fetchRestaurants()
+    .then(restaurants => {
         const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
-          callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
-        }
-      }
-    });
-      
-      
-      
+        return restaurant;
+    })
+    .catch(err => DBHelper.requestError(err));
   }
 
   /**
@@ -272,14 +265,40 @@ class DBHelper {
     return marker;
   }
     
+/**
+ * Add to IndexedDB storage
+ */
+  static async storeReviews(reviews) {
+    //Add to IndexedDB storage
+    return await DBHelper.dbPromise.then( db => {
+      if(!db) { 
+        return;
+        console.log('No DB found!');
+      }else{
+        console.log('DB found!');
+      }
+
+      const tx = db.transaction('reviews', 'readwrite');
+      const store = tx.objectStore('reviews');
+
+      reviews.map(
+        review => store.put(review)
+      );
+      console.log('Reviews: ', reviews);
+        
+      return reviews;
+    });
+  }
+    
+    
   /**
    * Fetch all reviews.
    */
-  static fetchReviews() {
+  static async fetchReviews() {
 
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
-    return DBHelper.dbPromise.then( db => {
+    return await DBHelper.dbPromise.then( db => {
       if(!db) { 
         return;
         console.log('No DB found!');
@@ -296,37 +315,12 @@ class DBHelper {
     }).then( reviews => {
         console.log('Reviews', reviews);
         if(reviews.length > 0){
-            return reviews;
+            return reviews.reverse();
         }else{
             fetch(DBHelper.DATABASE_URL+'reviews')
             .then(DBHelper.status)
             .then(DBHelper.json)
-            .then(data => {
-                console.log('Request succeeded with JSON response', data);
-                const reviews = data;
-                console.log('Reviews: ', reviews);
-
-            //Add to IndexedDB storage
-            DBHelper.dbPromise.then( db => {
-              if(!db) { 
-                return;
-                console.log('No DB found!');
-              }else{
-                console.log('DB found!');
-              }
-
-              const tx = db.transaction('reviews', 'readwrite');
-              const store = tx.objectStore('reviews');
-
-              data.map(
-                reviews => store.put(reviews)
-              );
-
-            });
-
-            // TODO: either live or cached data
-                return reviews;
-            })
+            .then(DBHelper.storeReviews)
             .catch(err => DBHelper.requestError(err));
         }
     });
@@ -334,21 +328,34 @@ class DBHelper {
     // After that get online data and put in IndexedDB
 
   }
+    
+
+  static async getReviewsByRestaurant(restaurant_id) {
+    console.log(restaurant_id);
+    
+    return await DBHelper.fetchReviews()
+    .then( reviews => {
+        // Filter restaurants to have only given cuisine type
+        const results = reviews.filter(r => r.restaurant_id == restaurant_id);
+        return results;
+    })
+    .catch(err => DBHelper.requestError(err));
+  }
 
   /**
    * Fetch reviews by restaurant id with proper error handling.
    */
-  static fetchReviewsByRestaurant(restaurant) {
+  static async fetchReviewsByRestaurant(restaurant_id) {
     
-    console.log(restaurant);
-    
-    return DBHelper.fetchReviews()
-    .then( reviews => {
-        // Filter restaurants to have only given cuisine type
-        const results = reviews.filter(r => r.restaurant_id == restaurant);
-        return results;
-    })
-    .catch(err => DBHelper.requestError(err));
+    return await fetch(DBHelper.DATABASE_URL+'reviews/?restaurant_id=' + restaurant_id )
+        .then(DBHelper.status)
+        .then(DBHelper.json)
+        .then(DBHelper.storeReviews)
+        .then( reviews => {
+            self.restaurant.reviews = reviews;
+            return reviews;
+        })
+        .catch(err => DBHelper.requestError(err));
       
   }
     
@@ -382,6 +389,26 @@ class DBHelper {
       })
       .catch(err => DBHelper.requestError(err));
   }
-    
+
+  /**
+   * Fetch reviews by restaurant id with proper error handling.
+   */
+  static async postReview(review){
+      return await fetch(DBHelper.DATABASE_URL+'reviews',
+      {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: review
+      }).then(DBHelper.status)
+      .then(DBHelper.json)
+      .then(data => {
+        console.log('Request succeeded with JSON response', data);
+          return data;
+      });
+        
+    }
 }
 
