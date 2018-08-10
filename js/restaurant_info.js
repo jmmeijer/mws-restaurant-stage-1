@@ -60,9 +60,12 @@ initForm = (restaurant = self.restaurant) => {
         console.log(data);
         console.log(json);
         
+        submitReview(json);
+        
         alert('submitting form');
     }, false);
 }
+
 initFavorite = (restaurant = self.restaurant) => {
 
     const favorite = document.getElementById('add-to-favorites');
@@ -82,7 +85,7 @@ initFavorite = (restaurant = self.restaurant) => {
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = (callback) => {
+fetchRestaurantFromURL = async (callback) => {
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant)
     return;
@@ -92,25 +95,41 @@ fetchRestaurantFromURL = (callback) => {
     error = 'No restaurant id in URL'
     callback(error, null);
   } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
+    DBHelper.fetchRestaurantById(id)
+    .then( restaurant => {
+    
       self.restaurant = restaurant;
+        
       if (!restaurant) {
-        console.error(error);
+        //console.error(error);
         return;
       }
-      fillRestaurantHTML();
-      callback(null, restaurant);
+        
+
         
         //TODO: just for now, improve this later!
-        DBHelper.fetchReviewsByRestaurant(restaurant.id).then(reviews => {
-            
-            self.restaurant.reviews = reviews;
+        DBHelper.getReviewsByRestaurant(restaurant.id)
+        .then(reviews => {
+            self.restaurant.reviews = reviews.reverse();
+            //fillReviewsHTML();
+        })
+        .catch(err => DBHelper.requestError(err));
+
+        DBHelper.fetchReviewsByRestaurant(restaurant.id)
+        .then(reviews => {
+            self.restaurant.reviews = reviews.reverse();
+            //resetReviewsHTML();
             fillReviewsHTML();
         })
         .catch(err => DBHelper.requestError(err));
         
-        
-    });
+        //fillReviewsHTML();
+    })
+    .then(restaurant => {
+        fillRestaurantHTML();
+        callback(null, restaurant);
+    })
+    .catch(err => DBHelper.requestError(err));
   }
 }
 
@@ -139,7 +158,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  //fillReviewsHTML();
+  fillReviewsHTML();
   initFavorite();
   initForm();
 }
@@ -185,6 +204,15 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
+}
+
+resetReviewsHTML = () => {
+  const ul = document.getElementById('reviews-list');
+  let length = ul.getElementsByTagName("li").length;
+    
+  for (i = 0; i < length; i++) {
+    ul.removeChild(ul.children[0]);
+  }
 }
 
 /**
@@ -261,5 +289,14 @@ toggleFavorite = (restaurant) => {
         self.restaurant.is_favorite = !state;
         //this.classList.toggle("favorite"); // TODO: bind class with data?
     });
+
+}
+
+submitReview = async (review) => {
+  await DBHelper.postReview(review)
+  .then( review => {    
+    const ul = document.getElementById('reviews-list');
+    ul.appendChild(createReviewHTML(review));
+  });
 
 }
