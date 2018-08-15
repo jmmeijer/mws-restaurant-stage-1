@@ -85,8 +85,7 @@ initFavorite = (restaurant = self.restaurant) => {
 fetchRestaurantFromURL = async () => {
   if (self.restaurant) {
     console('restaurant already fetched!');
-    //callback(null, self.restaurant)
-    return;
+    return self.restaurant;
   }
   const id = getParameterByName('id');
   if (!id) { // no id found in URL
@@ -103,8 +102,6 @@ fetchRestaurantFromURL = async () => {
         //console.error(error);
         return;
       }
-        
-
         return restaurant;
     })
     .then(restaurant => {
@@ -306,7 +303,9 @@ submitReview = async (review) => {
   await DBHelper.postReview(review)
   .then( review => {    
     const ul = document.getElementById('reviews-list');
-    ul.appendChild(createReviewHTML(review));
+      let html = createReviewHTML(review);
+      console.log(html);
+      ul.insertAdjacentElement('afterbegin', html);
   });
 
 }
