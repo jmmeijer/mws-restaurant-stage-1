@@ -389,23 +389,36 @@ class DBHelper {
    */
   static async postReview(review){
       if(!navigator.onLine){
-          // TODO: handle offline
+          // TODO: handle offline save to localstorage
+          // Check for Web Storage support
+        if (typeof(Storage) !== "undefined") {
+            
+            const reviews = [];
+            reviews.push(review);
+            localStorage.setItem("reviews", JSON.stringify(reviews));
+            return review;
+        } else {
+            // TODO: Display Error
+            console.error('Your browser does not support Web Storage!');
+        }
+
+      }else{
+          return await fetch(DBHelper.DATABASE_URL+'reviews',
+          {
+              method: "POST",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: review
+          }).then(DBHelper.status)
+          .then(DBHelper.json)
+          .then(data => {
+            console.log('Request succeeded with JSON response', data);
+              return data;
+          });
       }
-      return await fetch(DBHelper.DATABASE_URL+'reviews',
-      {
-          method: "POST",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: review
-      }).then(DBHelper.status)
-      .then(DBHelper.json)
-      .then(data => {
-        console.log('Request succeeded with JSON response', data);
-          return data;
-      });
-        
+
     }
 }
 
