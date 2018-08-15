@@ -91,7 +91,6 @@ fetchRestaurantFromURL = async () => {
   const id = getParameterByName('id');
   if (!id) { // no id found in URL
     error = 'No restaurant id in URL'
-    //callback(error, null);
     console.error(error);
     return error;
   } else {
@@ -113,7 +112,6 @@ fetchRestaurantFromURL = async () => {
         console.log('now filling restaurant!');
         
         fillRestaurantHTML();
-        //callback(null, restaurant);
         return restaurant;
     })
     .catch(err => DBHelper.requestError(err));
@@ -150,16 +148,21 @@ console.log('called fillRestaurantHTML!');
         //TODO: just for now, improve this later!
         DBHelper.getReviewsByRestaurant(restaurant.id)
         .then(reviews => {
-            self.restaurant.reviews = reviews.reverse();
-            //fillReviewsHTML();
-        })
-        .catch(err => DBHelper.requestError(err));
-
-        DBHelper.fetchReviewsByRestaurant(restaurant.id)
-        .then(reviews => {
-            self.restaurant.reviews = reviews.reverse();
+            console.log('first cached data');
+            self.restaurant.reviews = reviews;
             resetReviewsHTML();
             fillReviewsHTML();
+        })
+        .then( reviews => {
+            console.log('next... get live');
+             DBHelper.fetchReviewsByRestaurant(restaurant.id)
+            .then(reviews => {
+                self.restaurant.reviews = reviews.reverse();
+                resetReviewsHTML();
+                fillReviewsHTML();
+            })
+            .catch(err => DBHelper.requestError(err));
+            
         })
         .catch(err => DBHelper.requestError(err));
         

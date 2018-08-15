@@ -56,7 +56,7 @@ class DBHelper {
   /**
    * Fetch all restaurants.
    */
-  static async fetchRestaurants(callback) {
+  static async fetchRestaurants() {
 
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
@@ -77,7 +77,6 @@ class DBHelper {
     }).then( restaurants => {
         console.log(restaurants);
         if(restaurants.length > 0){
-            //callback(null, restaurants);
             return restaurants;
         }else{
             fetch(DBHelper.DATABASE_URL+'restaurants')
@@ -105,10 +104,7 @@ class DBHelper {
               );
 
             });
-
-            // Temporarily use callback for backwards compatibility, needs complete refactoring
             // TODO: either live or cached data
-                //callback(null, restaurants);
                 return restaurants;
             })
             .catch(err => DBHelper.requestError(err));
