@@ -388,21 +388,29 @@ class DBHelper {
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async postReview(review){
+      console.log(review);
       if(!navigator.onLine){
+          // give createdAt attribute
+          console.log('not online!');
           // TODO: handle offline save to localstorage
           // Check for Web Storage support
+          review.createdAt = new Date();
         if (typeof(Storage) !== "undefined") {
             
             const reviews = [];
             reviews.push(review);
             localStorage.setItem("reviews", JSON.stringify(reviews));
-            return review;
+            console.log(review);
         } else {
             // TODO: Display Error
             console.error('Your browser does not support Web Storage!');
         }
-
+          
+        return review;
       }else{
+          
+          review = JSON.stringify(review);
+          
           return await fetch(DBHelper.DATABASE_URL+'reviews',
           {
               method: "POST",

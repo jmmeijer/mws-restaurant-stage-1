@@ -48,16 +48,16 @@ initForm = (restaurant = self.restaurant) => {
         data.forEach(function(value, key){
             review[key] = value;
         });
-        const json = JSON.stringify(review);
+        //const json = JSON.stringify(review);
         
         // Disable form via fieldset while handling form data async
         const fieldset = form.querySelector('fieldset');
         fieldset.disabled = true;
         
         console.log(data);
-        console.log(json);
+        //console.log(json);
         
-        submitReview(json);
+        submitReview(review);
         
         alert('submitting form');
     }, false);
@@ -226,6 +226,9 @@ resetReviewsHTML = () => {
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = (review) => {
+    
+    console.log(review);
+    
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.innerHTML = review.name;
