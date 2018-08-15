@@ -169,12 +169,10 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+  static async fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
+    return await DBHelper.fetchRestaurants()
+    .then( restaurants => {
         let results = restaurants
         if (cuisine != 'all') { // filter by cuisine
           results = results.filter(r => r.cuisine_type == cuisine);
@@ -182,8 +180,8 @@ class DBHelper {
         if (neighborhood != 'all') { // filter by neighborhood
           results = results.filter(r => r.neighborhood == neighborhood);
         }
-        callback(null, results);
-      }
+        
+        return results;
     });
   }
 
@@ -394,6 +392,9 @@ class DBHelper {
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async postReview(review){
+      if(!navigator.onLine){
+          // TODO: handle offline
+      }
       return await fetch(DBHelper.DATABASE_URL+'reviews',
       {
           method: "POST",

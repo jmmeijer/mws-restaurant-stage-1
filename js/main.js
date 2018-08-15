@@ -72,6 +72,9 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize leaflet map, called from HTML.
  */
 initMap = () => {
+    
+    console.log('initMap!');
+    
   self.newMap = L.map('map', {
         center: [40.722216, -73.987501],
         zoom: 12,
@@ -92,7 +95,10 @@ initMap = () => {
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
+updateRestaurants = async () => {
+    
+    console.log('updateRestaurants called!');
+    
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
@@ -102,20 +108,11 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      console.log(restaurants);
-      if(restaurants.length == 0){
-        notify("No restaurants found.");
-      }else{
-        notify(restaurants.length +" restaurants found.");
-      }
+  return DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+  .then(restaurants => {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
-    }
-  })
+  });
 }
 
 /*
