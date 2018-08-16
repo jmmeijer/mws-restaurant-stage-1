@@ -61,16 +61,8 @@ class DBHelper {
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
     return await DBHelper.dbPromise.then( db => {
-      if(!db) { 
-        return;
-        console.log('No DB found!');
-      }else{
-        console.log('DB found!');
-      }
-
       const restaurants = db.transaction('restaurants')
         .objectStore('restaurants');
-      
         
       return restaurants.getAll();
 
@@ -89,13 +81,6 @@ class DBHelper {
 
             //Add to IndexedDB storage
             DBHelper.dbPromise.then( db => {
-              if(!db) { 
-                return;
-                console.log('No DB found!');
-              }else{
-                console.log('DB found!');
-              }
-
               const tx = db.transaction('restaurants', 'readwrite');
               const store = tx.objectStore('restaurants');
 
@@ -265,12 +250,6 @@ class DBHelper {
   static async storeReviews(reviews) {
     //Add to IndexedDB storage
     return await DBHelper.dbPromise.then( db => {
-      if(!db) { 
-        return;
-        console.log('No DB found!');
-      }else{
-        console.log('DB found!');
-      }
 
       const tx = db.transaction('reviews', 'readwrite');
       const store = tx.objectStore('reviews');
@@ -293,12 +272,6 @@ class DBHelper {
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
     return await DBHelper.dbPromise.then( db => {
-      if(!db) { 
-        return;
-        console.log('No DB found!');
-      }else{
-        console.log('DB found!');
-      }
 
       const reviews = db.transaction('reviews')
         .objectStore('reviews');
@@ -370,12 +343,6 @@ class DBHelper {
       .then(data => {
             //Add to IndexedDB storage
             DBHelper.dbPromise.then( db => {
-              if(!db) { 
-                return;
-                console.log('No DB found!');
-              }else{
-                console.log('DB found!');
-              }
 
               const tx = db.transaction('restaurants', 'readwrite');
               const store = tx.objectStore('restaurants');
