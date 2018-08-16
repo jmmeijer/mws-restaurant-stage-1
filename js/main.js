@@ -155,6 +155,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
+    console.log(restaurant.is_favorite);
   const li = document.createElement('li');
     
   const imageLink = document.createElement('a');
@@ -173,8 +174,9 @@ createRestaurantHTML = (restaurant) => {
     favoriteButton.classList.add('add-to-favorites');
     //favoriteButton.addEventListener('click', toggleFavorite, false);
     
-    if(restaurant.is_favorite === true){
-        favoriteButton.classList.toggle("favorite");
+    if(restaurant.is_favorite){
+        console.log(restaurant.is_favorite);
+        favoriteButton.classList.add("favorite");
     }
     
     favoriteButton.addEventListener('click', ()=>{

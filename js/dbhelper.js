@@ -354,7 +354,14 @@ class DBHelper {
   }
     
   static setFavorite(restaurant_id, is_favorite){
-      return fetch(DBHelper.DATABASE_URL+'restaurants/'+restaurant_id+'/?is_favorite='+is_favorite,
+
+    var url = new URL(DBHelper.DATABASE_URL+`restaurants/${restaurant_id}/`),
+    params = {is_favorite:is_favorite};
+      console.log(url);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+      console.log(url);
+      
+      return fetch(url,
            {
           method: "PUT"
       })
