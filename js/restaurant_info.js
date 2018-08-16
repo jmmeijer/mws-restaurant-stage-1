@@ -226,9 +226,6 @@ resetReviewsHTML = () => {
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = (review) => {
-    
-    console.log(review);
-    
   const li = document.createElement('li');
   const name = document.createElement('p');
   name.innerHTML = review.name;
@@ -307,7 +304,6 @@ submitReview = async (review) => {
   .then( review => {    
     const ul = document.getElementById('reviews-list');
       let html = createReviewHTML(review);
-      console.log(html);
       ul.insertAdjacentElement('afterbegin', html);
   });
 

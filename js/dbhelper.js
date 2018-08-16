@@ -388,7 +388,6 @@ class DBHelper {
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async postReview(review){
-      console.log(review);
       if(!navigator.onLine){
           // give createdAt attribute
           console.log('not online!');
@@ -397,9 +396,12 @@ class DBHelper {
           review.createdAt = new Date();
         if (typeof(Storage) !== "undefined") {
             
-            const reviews = [];
+            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            
+            
             reviews.push(review);
-            localStorage.setItem("reviews", JSON.stringify(reviews));
+            
+            localStorage.setItem('reviews', JSON.stringify(reviews));
             console.log(review);
         } else {
             // TODO: Display Error
