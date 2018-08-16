@@ -173,6 +173,15 @@ createRestaurantHTML = (restaurant) => {
     favoriteButton.classList.add('add-to-favorites');
     //favoriteButton.addEventListener('click', toggleFavorite, false);
     
+    if(restaurant.is_favorite === true){
+        favoriteButton.classList.toggle("favorite");
+    }
+    
+    favoriteButton.addEventListener('click', ()=>{
+        toggleFavorite(restaurant);
+        favoriteButton.classList.toggle("favorite");
+    }, false);
+    
     const favoriteLabel = document.createElement('span');
     favoriteLabel.classList.add('label');
     favoriteLabel.innerHTML = 'Add to favorites';
@@ -218,5 +227,18 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     }
     self.markers.push(marker);
   });
+
+}
+
+toggleFavorite = (restaurant) => {
+    //var element = document.getElementById("myDIV");
+    var state = restaurant.is_favorite;
+    console.log(state);
+    
+    DBHelper.setFavorite(restaurant.id, !state)
+    .then( () => {
+        restaurant.is_favorite = !state;
+        //this.classList.toggle("favorite"); // TODO: bind class with data?
+    });
 
 }
