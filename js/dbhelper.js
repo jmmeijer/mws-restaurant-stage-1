@@ -55,49 +55,73 @@ class DBHelper {
 
   /**
    * Fetch all restaurants.
+   * Cache then network, see also: 
+   * https://developers.google.com/web/ilt/pwa/caching-files-with-service-worker
+   * https://developers.google.com/web/fundamentals/instant-and-offline/offline-cookbook/
    */
   static async fetchRestaurants() {
+      
+    var networkDataReceived = false;
+      
+      const networkUpdate = await fetch(DBHelper.DATABASE_URL+'restaurants')
+        .then(DBHelper.status)
+        .then(DBHelper.json)
+        .then(data => {
+
+        networkDataReceived = true;
+
+            console.log('Request succeeded with JSON response', data);
+            //const restaurants = data;
+            //console.log('Restaurants: ', restaurants);
+
+        //Add to IndexedDB storage, move to service worker???
+        /*
+        DBHelper.dbPromise.then( db => {
+          const tx = db.transaction('restaurants', 'readwrite');
+          const store = tx.objectStore('restaurants');
+
+          data.map(
+            restaurant => store.put(restaurant)
+          );
+
+        });
+        */
+        // TODO: either live or cached data
+            return data;
+        });
 
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
-    return await DBHelper.dbPromise.then( db => {
+      
+    return DBHelper.dbPromise.then( db => {
       const restaurants = db.transaction('restaurants')
         .objectStore('restaurants');
         
       return restaurants.getAll();
 
     }).then( restaurants => {
-        console.log(restaurants);
-        if(restaurants.length > 0){
-            return restaurants;
-        }else{
-            fetch(DBHelper.DATABASE_URL+'restaurants')
-            .then(DBHelper.status)
-            .then(DBHelper.json)
-            .then(data => {
-                console.log('Request succeeded with JSON response', data);
-                const restaurants = data;
-                console.log('Restaurants: ', restaurants);
+        
+      console.log('restaurants from idb:', restaurants);
+        
+      if(restaurants.length > 0){
+          return restaurants;
+      }else{
+          console.log('restaurants array empty!');
+          throw Error("No data");
+      }
 
-            //Add to IndexedDB storage
-            DBHelper.dbPromise.then( db => {
-              const tx = db.transaction('restaurants', 'readwrite');
-              const store = tx.objectStore('restaurants');
-
-              data.map(
-                restaurant => store.put(restaurant)
-              );
-
-            });
-            // TODO: either live or cached data
-                return restaurants;
-            })
-            .catch(err => DBHelper.requestError(err));
-        }
-    });
-      
-    // After that get online data and put in IndexedDB
-
+    }).then( restaurants => {
+        
+      if (!networkDataReceived) {
+          console.log('No Network Data Received!');
+          return restaurants;
+      }
+        
+    }).catch(function() {
+        console.log('getting there???');
+        
+      return networkUpdate;
+    }).catch(err => DBHelper.requestError(err));
   }
     
 
@@ -151,6 +175,9 @@ class DBHelper {
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
   static async fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
+      
+      console.log(cuisine);
+      console.log(neighborhood);
     // Fetch all restaurants
     return await DBHelper.fetchRestaurants()
     .then( restaurants => {
