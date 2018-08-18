@@ -23,7 +23,6 @@ class DBHelper {
         });
     }
 
-
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
@@ -87,13 +86,11 @@ class DBHelper {
         });
         */
         // TODO: either live or cached data
+            DBHelper.storeRestaurants(data);
             return data;
-        });
-
-    // First try to get cached data from IndexedDB
-    // TODO: move to service worker
+        }).catch(err => DBHelper.requestError(err));;
       
-    return DBHelper.dbPromise.then( db => {
+    return await DBHelper.dbPromise.then( db => {
       const restaurants = db.transaction('restaurants')
         .objectStore('restaurants');
         
@@ -115,6 +112,8 @@ class DBHelper {
       if (!networkDataReceived) {
           console.log('No Network Data Received!');
           return restaurants;
+      }else{
+          return networkUpdate;
       }
         
     }).catch(function() {
@@ -124,7 +123,25 @@ class DBHelper {
     }).catch(err => DBHelper.requestError(err));
   }
     
+static async storeRestaurants(restaurants){
+    
+    console.log('restaurants to cache: ', restaurants)
+    
+    //Add to IndexedDB storage
+    return await DBHelper.dbPromise.then( db => {
+      //if(!db) return;
+        console.log(db);
+        
+      const tx = db.transaction('restaurants', 'readwrite');
+      const store = tx.objectStore('restaurants');
 
+      restaurants.map(
+        restaurant => store.put(restaurant)
+      );
+      return restaurants;
+
+    }).catch(err => DBHelper.requestError(err));
+}
 
   /**
    * Fetch a restaurant by its ID.
@@ -368,6 +385,8 @@ class DBHelper {
       .then(DBHelper.status)
       .then(DBHelper.json)
       .then(data => {
+          
+          console.log(data);
             //Add to IndexedDB storage
             DBHelper.dbPromise.then( db => {
 
@@ -376,11 +395,16 @@ class DBHelper {
                 
               store.get(restaurant_id)
               .then(restaurant => {
+                  console.log(restaurant);
                   restaurant.is_favorite = is_favorite;
-                  store.put(restaurant);
-              })
+                  //store.put(restaurant);
+              });
+                
+              store.put(data);
 
-            });
+            }).catch(err => DBHelper.requestError(err));
+          
+          ;
       })
       .catch(err => DBHelper.requestError(err));
   }
