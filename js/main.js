@@ -108,7 +108,7 @@ updateRestaurants = async () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  await DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
   .then(restaurants => {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
@@ -172,6 +172,7 @@ createRestaurantHTML = (restaurant) => {
     const favoriteButton = document.createElement('button');
     favoriteButton.classList.add('add-to-favorites');
     //favoriteButton.addEventListener('click', toggleFavorite, false);
+    favoriteButton.setAttribute('aria-label', `Add ${restaurant.name} to favorites`)
     
     if(restaurant.is_favorite == 'true'){
         favoriteButton.classList.add("favorite");
