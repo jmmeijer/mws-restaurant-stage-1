@@ -29,7 +29,8 @@ document.addEventListener('DOMContentLoaded', event => {
     }
     
     window.addEventListener('online', showOffLine);
-    window.addEventListener('offline', showOffLine); 
+    window.addEventListener('offline', showOffLine);
+    showOffLine();
 });
 
 showOffLine = () => {
