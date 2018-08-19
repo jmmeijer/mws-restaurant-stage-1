@@ -1,7 +1,11 @@
+importScripts('/js/idb.js');
+importScripts('/js/dbhelper.js');
+
 var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
 var allCaches = [staticCacheName, contentImgsCache];
 
+/*
 function openDatabase() {
   if (!navigator.serviceWorker) {
     return Promise.resolve();
@@ -18,6 +22,7 @@ function openDatabase() {
 }
 
 const dbPromise = openDatabase();
+*/
 
 self.addEventListener('install', function (event) {
   event.waitUntil(caches.open(staticCacheName).then(function (cache) {
@@ -45,6 +50,21 @@ self.addEventListener('activate', function (event) {
   }));
 });
 
+self.addEventListener('sync', event => {
+    
+  console.log('back online!');
+  event.waitUntil( async function() {
+    const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+    
+    if(reviews.length > 0){
+        reviews.forEach( review => {
+            DBHelper.postReview(review);
+        });
+        localStorage.removeItem('review');
+    }
+  });
+});
+
 self.addEventListener('fetch', function (event) {
   var requestUrl = new URL(event.request.url);
   if (requestUrl.origin === location.origin) {
@@ -59,11 +79,25 @@ self.addEventListener('fetch', function (event) {
   }
    
  if(requestUrl.href.startsWith('http://localhost:1337')){
+
      console.log('Calling API');
+     
+    if (requestUrl.pathname.startsWith('/restaurants')) {
+        
+        
+        event.respondWith(async function() {
+            return await fetch(event.request);
+        }());
+
+        console.log(requestUrl.search);
+        
+        console.log(requestUrl.searchParams.get('is_favorite'));
+        
+    }else{
      event.respondWith(showCachedRestaurants(event.request));
+    }
      return;
  }
-
 
   event.respondWith(caches.match(event.request, {ignoreSearch: true}).then(function (response) {
     return response || fetch(event.request).then(function(response) {
@@ -92,9 +126,9 @@ function serveIMG(request) {
     return cache.match(storageUrl).then(function (response) {
       if (response) return response;
 
-      return fetch(request).then(function (networkResponse) {
-        cache.put(storageUrl, networkResponse.clone());
-        return networkResponse;
+      return fetch(request).then(function (response) {
+        cache.put(storageUrl, response.clone());
+        return response;
       }).catch(function(error) {
         console.error('Fetching failed:', error);
         throw error;
