@@ -48,6 +48,7 @@ showOffLine = () => {
 notify = (notification) => {
     const div = document.getElementById('notification');
     div.innerHTML = notification;
+    div.style.visibility = "visible";
 }
 /*
 * Notification
@@ -55,4 +56,5 @@ notify = (notification) => {
 resetNotification = () => {
     const div = document.getElementById('notification');
     div.innerHTML = '';
+    div.style.visibility = "hidden";
 }
