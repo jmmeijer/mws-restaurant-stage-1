@@ -115,14 +115,6 @@ updateRestaurants = async () => {
   });
 }
 
-/*
-* Notification
-*/
-notify = (notification) => {
-    const div = document.getElementById('notification');
-    div.innerHTML = notification;
-}
-
 /**
  * Clear current restaurants, their HTML and remove their map markers.
  */
