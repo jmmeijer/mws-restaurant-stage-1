@@ -302,6 +302,13 @@ a.button{
   color: #666;
 }
 
+.notification{
+    padding:15px;
+    background:#fff;
+    border-left:5px solid #fb0;
+    box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+
 /*  */
 button{
   font-size: 10pt;
