@@ -213,37 +213,31 @@ static async storeRestaurants(restaurants){
   /**
    * Fetch all neighborhoods with proper error handling.
    */
-  static fetchNeighborhoods(callback) {
+  static async fetchNeighborhoods() {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        // Get all neighborhoods from all restaurants
-        const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
-        // Remove duplicates from neighborhoods
-        const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
-        callback(null, uniqueNeighborhoods);
-      }
-    });
+    return await DBHelper.fetchRestaurants().then(restaurants => {
+      // Get all neighborhoods from all restaurants
+      const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+      console.log(neighborhoods);
+      // Remove duplicates from neighborhoods
+      const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
+      return  uniqueNeighborhoods;
+    }).catch(err => DBHelper.requestError(err));
   }
 
   /**
    * Fetch all cuisines with proper error handling.
    */
-  static fetchCuisines(callback) {
+  static async fetchCuisines() {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        // Get all cuisines from all restaurants
-        const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-        // Remove duplicates from cuisines
-        const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
-        callback(null, uniqueCuisines);
-      }
-    });
+    return await DBHelper.fetchRestaurants().then(restaurants => {
+      // Get all cuisines from all restaurants
+      const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+      console.log(cuisines);
+      // Remove duplicates from cuisines
+      const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+      return uniqueCuisines;
+    }).catch(err => DBHelper.requestError(err));
   }
 
   /**

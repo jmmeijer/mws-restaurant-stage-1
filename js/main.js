@@ -16,14 +16,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
 /**
  * Fetch all neighborhoods and set their HTML.
  */
-fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) { // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
+fetchNeighborhoods = function() {
+  DBHelper.fetchNeighborhoods().then(neighborhoods => {
+    console.log(neighborhoods);
+    self.neighborhoods = neighborhoods;
+    
+  }).then(neighborhoods => {
       fillNeighborhoodsHTML();
-    }
   });
 }
 
@@ -43,14 +42,11 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 /**
  * Fetch all cuisines and set their HTML.
  */
-fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
-    }
+fetchCuisines = async function() {
+  return await DBHelper.fetchCuisines().then(cuisines => {
+    console.log(cuisines);
+    self.cuisines = cuisines;
+    fillCuisinesHTML();
   });
 }
 
