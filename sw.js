@@ -1,5 +1,5 @@
-//importScripts('/js/idb.js');
-//importScripts('/js/dbhelper.js');
+importScripts('./js/idb.js');
+importScripts('./js/dbhelper.js');
 
 var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
@@ -98,15 +98,12 @@ self.addEventListener('sync', event => {
   console.log('and were back online!');
   if (event.tag == 'reviews') {
       console.log('event tag: ', event.tag);
-      event.waitUntil(async function (){
-          return await DBHelper.getQueuedReviews().then(reviews => {
+      event.waitUntil(DBHelper.getQueuedReviews().then(reviews => {
               console.log('Reviews from localStorage: ', reviews);
               DBHelper.postReviews(reviews);
           }).catch(error=> {
             console.error('Error: ', error);
-          });
-      }
-
+          })
       );
   }
 });
