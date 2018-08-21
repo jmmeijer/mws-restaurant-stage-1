@@ -1,5 +1,5 @@
-importScripts('/js/idb.js');
-importScripts('/js/dbhelper.js');
+//importScripts('/js/idb.js');
+//importScripts('/js/dbhelper.js');
 
 var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
@@ -24,7 +24,7 @@ function openDatabase() {
 const dbPromise = openDatabase();
 */
 
-self.addEventListener('install', function (event) {
+self.addEventListener('install',  event => {
   event.waitUntil(caches.open(staticCacheName).then(function (cache) {
     return cache.addAll([
         '/',
@@ -40,7 +40,7 @@ self.addEventListener('install', function (event) {
   }));
 });
 
-self.addEventListener('activate', function (event) {
+self.addEventListener('activate',  event => {
   event.waitUntil(caches.keys().then(function (cacheNames) {
     return Promise.all(cacheNames.filter(function (cacheName) {
       return cacheName.startsWith('rra-') && !allCaches.includes(cacheName);
@@ -50,22 +50,7 @@ self.addEventListener('activate', function (event) {
   }));
 });
 
-self.addEventListener('sync', event => {
-    
-  console.log('back online!');
-  event.waitUntil( async function() {
-    const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-    
-    if(reviews.length > 0){
-        reviews.forEach( review => {
-            DBHelper.postReview(review);
-        });
-        localStorage.removeItem('review');
-    }
-  });
-});
-
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch',  event => {
   var requestUrl = new URL(event.request.url);
   if (requestUrl.origin === location.origin) {
     if (requestUrl.pathname.startsWith('/img/')) {
@@ -108,6 +93,25 @@ self.addEventListener('fetch', function (event) {
       });
   }));
 });
+
+self.addEventListener('sync', event => {
+  console.log('and were back online!');
+  if (event.tag == 'reviews') {
+      console.log('event tag: ', event.tag);
+      event.waitUntil(async function (){
+          return await DBHelper.getQueuedReviews().then(reviews => {
+              console.log('Reviews from localStorage: ', reviews);
+              DBHelper.postReviews(reviews);
+          }).catch(error=> {
+            console.error('Error: ', error);
+          });
+      }
+
+      );
+  }
+});
+
+
 
 function showCachedRestaurants(request){
     console.log(request);

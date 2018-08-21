@@ -192,9 +192,6 @@ static async storeRestaurants(restaurants){
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
   static async fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
-      
-      console.log(cuisine);
-      console.log(neighborhood);
     // Fetch all restaurants
     return await DBHelper.fetchRestaurants()
     .then( restaurants => {
@@ -336,8 +333,6 @@ static async storeRestaurants(restaurants){
     
 
   static async getReviewsByRestaurant(restaurant_id) {
-    console.log(restaurant_id);
-    
     return await DBHelper.fetchReviews()
     .then( reviews => {
         // Filter restaurants to have only given cuisine type
@@ -402,22 +397,15 @@ static async storeRestaurants(restaurants){
       })
       .catch(err => DBHelper.requestError(err));
   }
-
-  /**
-   * Fetch reviews by restaurant id with proper error handling.
-   */
-  static async postReview(review){
-      if(!navigator.onLine){
-          // give createdAt attribute
-          console.log('not online!');
-          // TODO: handle offline save to localstorage
-          // Check for Web Storage support
-          review.createdAt = new Date();
+    
+static storeReview(review){
+        // Check for Web Storage support
+        
         if (typeof(Storage) !== "undefined") {
+            // Add date attribute
+            review.createdAt = new Date();
             
             const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-            
-            
             reviews.push(review);
             
             localStorage.setItem('reviews', JSON.stringify(reviews));
@@ -426,6 +414,37 @@ static async storeRestaurants(restaurants){
             // TODO: Display Error
             console.error('Your browser does not support Web Storage!');
         }
+}
+
+/**
+* Get reviews from localstorage if any
+*/
+  static getQueuedReviews(){
+      const reviews = localStorage.getItem('reviews');
+      reviews = JSON.parse(reviews) || [];
+      return reviews;
+  }
+    
+static postReviews(reviews) {
+
+    if(reviews.length > 0){
+        reviews.forEach( review => {
+            DBHelper.postReview(review);
+        });
+        localStorage.removeItem('reviews');
+    }
+    
+}
+    
+    
+  /**
+   * Fetch reviews by restaurant id with proper error handling.
+   */
+  static async postReview(review){
+      if(!navigator.onLine){
+          // give createdAt attribute
+          console.log('not online!');
+          DBHelper.storeReview(review);
           
         return review;
       }else{
@@ -445,7 +464,7 @@ static async storeRestaurants(restaurants){
           .then(data => {
             console.log('Request succeeded with JSON response', data);
               return data;
-          });
+          }).catch(err => DBHelper.requestError(err));
       }
 
     }

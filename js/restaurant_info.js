@@ -57,9 +57,10 @@ initForm = (restaurant = self.restaurant) => {
         console.log(data);
         //console.log(json);
         
-        submitReview(review);
+        submitReview(review).then(() => {
+            console.log('form submitted');
+        });
         
-        alert('submitting form');
     }, false);
 }
 
@@ -300,7 +301,7 @@ toggleFavorite = (restaurant) => {
 }
 
 submitReview = async (review) => {
-  await DBHelper.postReview(review)
+  return await DBHelper.postReview(review)
   .then( review => {    
     const ul = document.getElementById('reviews-list');
       let html = createReviewHTML(review);

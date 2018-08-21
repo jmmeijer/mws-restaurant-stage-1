@@ -17,15 +17,27 @@ document.addEventListener('DOMContentLoaded', event => {
           
         if ('sync' in registration) {
           console.log('Sync supported!');
+            
+const form = document.getElementById('review-form');
+form.addEventListener('submit', event => {
+            console.log('submitted form!');
+          registration.sync.register('reviews').then( registration => {
+            console.log('Sync registered!');
+          }).catch(error => {
+              console.error('Error: ', error);
+          });
+    
+ }, false);
+            
         }
-          
-        return reg.sync.register('tag-name');
+        return registration;
+       
           
       }).catch(function() {
         
       });
     } else {
-      
+      console.log('Service workers and background sync are not supported.');
     }
     
     window.addEventListener('online', showOffLine);
