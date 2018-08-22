@@ -381,15 +381,15 @@ static async storeRestaurants(restaurants){
       
   }
     
-  static setFavorite(restaurant_id, is_favorite){
-
+  static async setFavorite(restaurant_id, is_favorite){
+ console.log(is_favorite);
     var url = new URL(DBHelper.DATABASE_URL+`restaurants/${restaurant_id}/`),
     params = {is_favorite:is_favorite};
       console.log(url);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
       console.log(url);
       
-      return fetch(url,
+      return await fetch(url,
            {
           method: "PUT"
       })
@@ -397,28 +397,44 @@ static async storeRestaurants(restaurants){
       .then(DBHelper.json)
       .then(data => {
           
-          console.log(data);
-            //Add to IndexedDB storage
-            DBHelper.dbPromise.then( db => {
+        console.log(data);
+        //Add to IndexedDB storage
+        DBHelper.dbPromise.then( db => {
 
-              const tx = db.transaction('restaurants', 'readwrite');
-              const store = tx.objectStore('restaurants');
-                
-              store.get(restaurant_id)
-              .then(restaurant => {
-                  console.log(restaurant);
-                  restaurant.is_favorite = is_favorite;
-                  //store.put(restaurant);
-              });
-                
-              store.put(data);
+          const tx = db.transaction('restaurants', 'readwrite');
+          const store = tx.objectStore('restaurants');
+          /*
+          store.get(restaurant_id)
+          .then(restaurant => {
+              console.log(restaurant);
+              restaurant.is_favorite = is_favorite;
+              //store.put(restaurant);
+          });
+          */
+          store.put(data);
 
-            }).catch(err => DBHelper.requestError(err));
-          
-          ;
+        }).catch(err => DBHelper.requestError(err));
       })
       .catch(err => DBHelper.requestError(err));
   }
+    
+static async storeFavorite(restaurant_id, is_favorite){
+    
+    return await DBHelper.dbPromise.then( db => {
+
+      const tx = db.transaction('restaurants', 'readwrite');
+      const store = tx.objectStore('restaurants');
+
+      store.get(restaurant_id)
+      .then(restaurant => {
+          console.log(restaurant);
+          restaurant.is_favorite = is_favorite;
+          store.put(restaurant);
+      });
+        
+      return restaurant;
+    }).catch(err => DBHelper.requestError(err));
+} 
     
 static async storeReview(review){
         // Check for Web Storage support

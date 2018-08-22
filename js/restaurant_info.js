@@ -37,7 +37,7 @@ initForm = (restaurant = self.restaurant) => {
     const form = document.getElementById('review-form');
     document.getElementById('restaurant_id').value = restaurant.id;
     
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', event => {
         
         // Don't submit just yet
         event.preventDefault();
@@ -68,7 +68,10 @@ initFavorite = (restaurant = self.restaurant) => {
 
     const favorite = document.getElementById('add-to-favorites');
     
-    if(restaurant.is_favorite === true){
+    console.log('is_favorite?', restaurant.is_favorite);
+    
+    if(restaurant.is_favorite === true || restaurant.is_favorite === 'true'){
+        console.log('not favorite');
         favorite.classList.toggle("favorite");
     }
     
@@ -276,9 +279,15 @@ getDateFromTimestamp = (timestamp) => {
 }
 
 toggleFavorite = (restaurant) => {
-    //var element = document.getElementById("myDIV");
-    var state = restaurant.is_favorite;
+    let state = restaurant.is_favorite;
     console.log(state);
+    
+    //check in case is_favorite contains sting set to bool
+    if(state === 'true'){
+       state = true;
+    }else if(state === 'false'){
+        state = false;
+    }
     
     DBHelper.setFavorite(restaurant.id, !state)
     .then( () => {
@@ -289,8 +298,17 @@ toggleFavorite = (restaurant) => {
 }
 
 submitReview = async (review) => {
-  return await DBHelper.storeReview(review)
-  .then( review => {    
+  return await DBHelper.storeReview(review).then(() => {
+    // Wait for the scoped service worker registration to get a
+    // service worker with an active state
+    return navigator.serviceWorker.ready;
+  }).then(registration => {
+    return registration.sync.register('reviews');
+  }).then(() => {
+    console.log('Sync registered!');
+  }).catch(() => {
+    console.log('Sync registration failed :(');
+  }).then( review => {    
     const ul = document.getElementById('reviews-list');
       let html = createReviewHTML(review);
       ul.insertAdjacentElement('afterbegin', html);
