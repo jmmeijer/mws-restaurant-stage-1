@@ -219,15 +219,3 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 
 }
 
-toggleFavorite = (restaurant) => {
-    //var element = document.getElementById("myDIV");
-    var state = restaurant.is_favorite;
-    console.log(state);
-    
-    DBHelper.setFavorite(restaurant.id, !state)
-    .then( () => {
-        restaurant.is_favorite = !state;
-        //this.classList.toggle("favorite"); // TODO: bind class with data?
-    });
-
-}

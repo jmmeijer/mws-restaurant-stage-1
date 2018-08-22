@@ -81,3 +81,20 @@ resetNotification = () => {
     div.innerHTML = '';
     div.style.visibility = "hidden";
 }
+
+toggleFavorite = (restaurant) => {
+    var state = restaurant.is_favorite;
+    console.log(state);
+    
+    //check in case is_favorite contains sting set to bool
+    if(state === 'true'){
+       state = true;
+    }else if(state === 'false'){
+        state = false;
+    }
+    
+    DBHelper.setFavorite(restaurant.id, !state)
+    .then( () => {
+        restaurant.is_favorite = !state;
+    });
+}

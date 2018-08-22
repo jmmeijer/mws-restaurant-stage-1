@@ -278,25 +278,6 @@ getDateFromTimestamp = (timestamp) => {
   return `${month} ${date}, ${year}`;
 }
 
-toggleFavorite = (restaurant) => {
-    let state = restaurant.is_favorite;
-    console.log(state);
-    
-    //check in case is_favorite contains sting set to bool
-    if(state === 'true'){
-       state = true;
-    }else if(state === 'false'){
-        state = false;
-    }
-    
-    DBHelper.setFavorite(restaurant.id, !state)
-    .then( () => {
-        self.restaurant.is_favorite = !state;
-        //this.classList.toggle("favorite"); // TODO: bind class with data?
-    });
-
-}
-
 submitReview = async (review) => {
   return await DBHelper.storeReview(review).then(() => {
     // Wait for the scoped service worker registration to get a
