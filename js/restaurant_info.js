@@ -71,7 +71,6 @@ initFavorite = (restaurant = self.restaurant) => {
     console.log('is_favorite?', restaurant.is_favorite);
     
     if(restaurant.is_favorite == 'true'){
-        console.log('not favorite');
         favorite.classList.toggle("favorite");
     }
     
