@@ -99,7 +99,7 @@ self.addEventListener('sync', event => {
   if (event.tag == 'reviews') {
       console.log('event tag: ', event.tag);
       event.waitUntil(DBHelper.getQueuedReviews().then(reviews => {
-              console.log('Reviews from localStorage: ', reviews);
+              console.log('Reviews from idb: ', reviews);
               DBHelper.postReviews(reviews);
           }).catch(error=> {
             console.error('Error: ', error);

@@ -346,7 +346,7 @@ static async storeRestaurants(restaurants){
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async fetchReviewsByRestaurant(restaurant_id) {
-    
+    // TODO: race!!!
     return await fetch(DBHelper.DATABASE_URL+'reviews/?restaurant_id=' + restaurant_id )
         .then(DBHelper.status)
         .then(DBHelper.json)
@@ -398,41 +398,44 @@ static async storeRestaurants(restaurants){
       .catch(err => DBHelper.requestError(err));
   }
     
-static storeReview(review){
+static async storeReview(review){
         // Check for Web Storage support
+    review.id = 0;
+    review.createdAt = new Date();
+    review.synced = false;
+    
+    return await DBHelper.dbPromise.then( db => {
+
+      const tx = db.transaction('reviews', 'readwrite');
+      const store = tx.objectStore('reviews');
+
+      store.put(review);
+      console.log('Review stored in idb: ', review);
         
-        if (typeof(Storage) !== "undefined") {
-            // Add date attribute
-            review.createdAt = new Date();
-            
-            const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-            reviews.push(review);
-            
-            localStorage.setItem('reviews', JSON.stringify(reviews));
-            console.log(review);
-        } else {
-            // TODO: Display Error
-            console.error('Your browser does not support Web Storage!');
-        }
+      return review;
+    });
 }
 
 /**
-* Get reviews from localstorage if any
+* Get reviews from IDB with synced flag false if any
 */
   static async getQueuedReviews(){
-      await null;
-      const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-      return reviews;
+    return await DBHelper.fetchReviews()
+    .then( reviews => {
+        // Filter restaurants to have only given cuisine type
+        const results = reviews.filter(r => r.synced == false);
+        return results;
+    })
+    .catch(err => DBHelper.requestError(err));
   }
     
 static async postReviews(reviews) {
 console.log(reviews);
     if(reviews.length > 0){
-        reviews.forEach( review => {
-            await DBHelper.postReview(review);
-        });
+      reviews.map(
+        review => DBHelper.postReview(review)
+      );
     }
-    
 }
     
     static clearReviews() {
@@ -444,14 +447,6 @@ console.log(reviews);
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async postReview(review){
-      if(!navigator.onLine){
-          // give createdAt attribute
-          console.log('not online!');
-          return await DBHelper.storeReview(review);
-          
-        return review;
-      }else{
-          
           review = JSON.stringify(review);
           
           return await fetch(DBHelper.DATABASE_URL+'reviews',
@@ -469,7 +464,5 @@ console.log(reviews);
               return data;
           }).catch(err => DBHelper.requestError(err));
       }
-
-    }
 }
 

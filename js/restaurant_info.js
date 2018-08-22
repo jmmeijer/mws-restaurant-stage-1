@@ -147,7 +147,7 @@ console.log('called fillRestaurantHTML!');
         DBHelper.getReviewsByRestaurant(restaurant.id)
         .then(reviews => {
             console.log('first cached data');
-            self.restaurant.reviews = reviews;
+            self.restaurant.reviews = reviews.reverse();
             resetReviewsHTML();
             fillReviewsHTML();
         })
@@ -301,11 +301,10 @@ toggleFavorite = (restaurant) => {
 }
 
 submitReview = async (review) => {
-  return await DBHelper.postReview(review)
+  return await DBHelper.storeReview(review)
   .then( review => {    
     const ul = document.getElementById('reviews-list');
       let html = createReviewHTML(review);
       ul.insertAdjacentElement('afterbegin', html);
   });
-
 }
