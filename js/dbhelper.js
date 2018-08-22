@@ -70,25 +70,10 @@ class DBHelper {
         networkDataReceived = true;
 
             console.log('Request succeeded with JSON response', data);
-            //const restaurants = data;
-            //console.log('Restaurants: ', restaurants);
 
-        //Add to IndexedDB storage, move to service worker???
-        /*
-        DBHelper.dbPromise.then( db => {
-          const tx = db.transaction('restaurants', 'readwrite');
-          const store = tx.objectStore('restaurants');
-
-          data.map(
-            restaurant => store.put(restaurant)
-          );
-
-        });
-        */
-        // TODO: either live or cached data
             DBHelper.storeRestaurants(data);
             return data;
-        }).catch(err => DBHelper.requestError(err));;
+        }).catch(err => DBHelper.requestError(err));
       
     return await DBHelper.dbPromise.then( db => {
       const restaurants = db.transaction('restaurants')
@@ -159,32 +144,24 @@ static async storeRestaurants(restaurants){
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */
-  static fetchRestaurantByCuisine(cuisine, callback) {
+  static async fetchRestaurantByCuisine(cuisine) {
     // Fetch all restaurants  with proper error handling
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        // Filter restaurants to have only given cuisine type
-        const results = restaurants.filter(r => r.cuisine_type == cuisine);
-        callback(null, results);
-      }
-    });
+        await DBHelper.fetchRestaurants().then(restaurants => {
+            // Filter restaurants to have only given cuisine type
+            const results = restaurants.filter(r => r.cuisine_type == cuisine);
+            return results;
+        });
   }
 
   /**
    * Fetch restaurants by a neighborhood with proper error handling.
    */
-  static fetchRestaurantByNeighborhood(neighborhood, callback) {
+  static async fetchRestaurantByNeighborhood(neighborhood) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
+    await DBHelper.fetchRestaurants().then(restaurants => {
         // Filter restaurants to have only given neighborhood
         const results = restaurants.filter(r => r.neighborhood == neighborhood);
-        callback(null, results);
-      }
+        return results;
     });
   }
 
