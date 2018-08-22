@@ -109,9 +109,6 @@ fetchRestaurantFromURL = async () => {
         return restaurant;
     })
     .then(restaurant => {
-        
-        console.log('now filling restaurant!');
-        
         fillRestaurantHTML();
         return restaurant;
     })
@@ -123,9 +120,6 @@ fetchRestaurantFromURL = async () => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-    
-console.log('called fillRestaurantHTML!');
-    
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
@@ -279,7 +273,11 @@ getDateFromTimestamp = (timestamp) => {
 }
 
 submitReview = async (review) => {
-  return await DBHelper.storeReview(review).then(() => {
+  return await DBHelper.storeReview(review).then( review => {    
+    const ul = document.getElementById('reviews-list');
+      let html = createReviewHTML(review);
+      ul.insertAdjacentElement('afterbegin', html);
+  }).then(() => {
     // Wait for the scoped service worker registration to get a
     // service worker with an active state
     return navigator.serviceWorker.ready;
@@ -289,9 +287,5 @@ submitReview = async (review) => {
     console.log('Sync registered!');
   }).catch(() => {
     console.log('Sync registration failed :(');
-  }).then( review => {    
-    const ul = document.getElementById('reviews-list');
-      let html = createReviewHTML(review);
-      ul.insertAdjacentElement('afterbegin', html);
   });
 }
