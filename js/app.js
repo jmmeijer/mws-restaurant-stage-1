@@ -49,7 +49,18 @@ showOffLine = () => {
   if (!navigator.onLine){
     notify('No connection. Any reviews you submit will be send when back online.');
   }else{
+      
+          DBHelper.getQueuedReviews().then(reviews => {
+              console.log('Reviews from localStorage: ', reviews);
+              DBHelper.postReviews(reviews);
+          }).catch(error=> {
+            console.error('Error: ', error);
+          })
+      
     resetNotification();
+      
+      
+      
   }
 }
 

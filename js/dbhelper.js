@@ -419,22 +419,25 @@ static storeReview(review){
 /**
 * Get reviews from localstorage if any
 */
-  static getQueuedReviews(){
-      const reviews = localStorage.getItem('reviews');
-      reviews = JSON.parse(reviews) || [];
+  static async getQueuedReviews(){
+      await null;
+      const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
       return reviews;
   }
     
-static postReviews(reviews) {
-
+static async postReviews(reviews) {
+console.log(reviews);
     if(reviews.length > 0){
         reviews.forEach( review => {
-            DBHelper.postReview(review);
+            await DBHelper.postReview(review);
         });
-        localStorage.removeItem('reviews');
     }
     
 }
+    
+    static clearReviews() {
+        localStorage.removeItem('reviews');
+    }
     
     
   /**
@@ -444,7 +447,7 @@ static postReviews(reviews) {
       if(!navigator.onLine){
           // give createdAt attribute
           console.log('not online!');
-          DBHelper.storeReview(review);
+          return await DBHelper.storeReview(review);
           
         return review;
       }else{
