@@ -1,5 +1,5 @@
-importScripts('./js/idb.js');
-importScripts('./js/dbhelper.js');
+importScripts('/js/idb.js');
+importScripts('/js/dbhelper.js');
 
 var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
