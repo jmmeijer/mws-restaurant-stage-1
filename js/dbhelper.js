@@ -274,7 +274,28 @@ static async storeRestaurants(restaurants){
       return reviews;
     });
   }
-    
+
+/**
+* Why doesn't this work!??
+*/
+
+  static async getReviews() {
+    return await DBHelper.openDatabase().then( db => {
+      const reviews = db.transaction('reviews')
+        .objectStore('reviews');
+        
+      return reviews.getAll();
+
+    }).then( reviews => {
+        console.log('Reviews', reviews);
+        if(reviews.length > 0){
+            return reviews;
+        }else{
+          console.log('reviews array empty!');
+          throw Error("No data");
+        }
+    }).catch(err => DBHelper.requestError(err));
+  }
     
   /**
    * Fetch all reviews.
@@ -294,23 +315,7 @@ static async storeRestaurants(restaurants){
         return data;
     }).catch(err => DBHelper.requestError(err));
     
-    // First try to get cached data from IndexedDB
-    // TODO: move to service worker
-    return await DBHelper.dbPromise.then( db => {
-      const reviews = db.transaction('reviews')
-        .objectStore('reviews');
-        
-      return reviews.getAll();
-
-    }).then( reviews => {
-        console.log('Reviews', reviews);
-        if(reviews.length > 0){
-            return reviews.reverse();
-        }else{
-          console.log('reviews array empty!');
-          throw Error("No data");
-        }
-    }).then( reviews => {
+    return await DBHelper.getReviews().then( reviews => {
         
       if (!networkDataReceived) {
           console.log('No Network Data Received!');
@@ -342,7 +347,6 @@ static async storeRestaurants(restaurants){
    * Fetch reviews by restaurant id with proper error handling.
    */
   static async fetchReviewsByRestaurant(restaurant_id) {
-    // TODO: race!!!
     var networkDataReceived = false;
       
     const networkUpdate = await fetch(DBHelper.DATABASE_URL+'reviews/?restaurant_id=' + restaurant_id )
@@ -382,12 +386,9 @@ static async storeRestaurants(restaurants){
   }
     
   static async setFavorite(restaurant_id, is_favorite){
- console.log(is_favorite);
     var url = new URL(DBHelper.DATABASE_URL+`restaurants/${restaurant_id}/`),
     params = {is_favorite:is_favorite};
-      console.log(url);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-      console.log(url);
       
       return await fetch(url,
            {
@@ -458,13 +459,12 @@ static async storeReview(review){
 * Get reviews from IDB with synced flag false if any
 */
   static async getQueuedReviews(){
-    return await DBHelper.fetchReviews()
+    return await DBHelper.getReviews()
     .then( reviews => {
         // Filter restaurants to have only given cuisine type
-        const results = reviews.filter(r => r.synced == false);
+        const results = reviews.filter(r => r.id == 0);
         return results;
-    })
-    .catch(err => DBHelper.requestError(err));
+    }).catch(err => DBHelper.requestError(err));
   }
     
 static async postReviews(reviews) {
