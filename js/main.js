@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
  */
 fetchNeighborhoods = function() {
   DBHelper.fetchNeighborhoods().then(neighborhoods => {
-    console.log(neighborhoods);
     self.neighborhoods = neighborhoods;
     
   }).then(neighborhoods => {
@@ -44,7 +43,6 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  */
 fetchCuisines = async function() {
   return await DBHelper.fetchCuisines().then(cuisines => {
-    console.log(cuisines);
     self.cuisines = cuisines;
     fillCuisinesHTML();
   });
@@ -68,9 +66,6 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize leaflet map, called from HTML.
  */
 initMap = () => {
-    
-    console.log('initMap!');
-    
   self.newMap = L.map('map', {
         center: [40.722216, -73.987501],
         zoom: 12,
@@ -92,9 +87,6 @@ initMap = () => {
  * Update page and map for current restaurants.
  */
 updateRestaurants = async () => {
-    
-    console.log('updateRestaurants called!');
-    
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
