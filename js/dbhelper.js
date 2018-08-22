@@ -62,18 +62,18 @@ class DBHelper {
       
     var networkDataReceived = false;
       
-      const networkUpdate = await fetch(DBHelper.DATABASE_URL+'restaurants')
-        .then(DBHelper.status)
-        .then(DBHelper.json)
-        .then(data => {
+    const networkUpdate = await fetch(DBHelper.DATABASE_URL+'restaurants')
+    .then(DBHelper.status)
+    .then(DBHelper.json)
+    .then(data => {
 
         networkDataReceived = true;
 
-            console.log('Request succeeded with JSON response', data);
+        console.log('Request succeeded with JSON response', data);
 
-            DBHelper.storeRestaurants(data);
-            return data;
-        }).catch(err => DBHelper.requestError(err));
+        DBHelper.storeRestaurants(data);
+        return data;
+    }).catch(err => DBHelper.requestError(err));
       
     return await DBHelper.dbPromise.then( db => {
       const restaurants = db.transaction('restaurants')
@@ -146,11 +146,11 @@ static async storeRestaurants(restaurants){
    */
   static async fetchRestaurantByCuisine(cuisine) {
     // Fetch all restaurants  with proper error handling
-        await DBHelper.fetchRestaurants().then(restaurants => {
-            // Filter restaurants to have only given cuisine type
-            const results = restaurants.filter(r => r.cuisine_type == cuisine);
-            return results;
-        });
+    return await DBHelper.fetchRestaurants().then(restaurants => {
+        // Filter restaurants to have only given cuisine type
+        const results = restaurants.filter(r => r.cuisine_type == cuisine);
+        return results;
+    });
   }
 
   /**
@@ -158,7 +158,7 @@ static async storeRestaurants(restaurants){
    */
   static async fetchRestaurantByNeighborhood(neighborhood) {
     // Fetch all restaurants
-    await DBHelper.fetchRestaurants().then(restaurants => {
+    return await DBHelper.fetchRestaurants().then(restaurants => {
         // Filter restaurants to have only given neighborhood
         const results = restaurants.filter(r => r.neighborhood == neighborhood);
         return results;
@@ -280,14 +280,25 @@ static async storeRestaurants(restaurants){
    * Fetch all reviews.
    */
   static async fetchReviews() {
+      
+    var networkDataReceived = false;
+      
+    const networkUpdate = await fetch(DBHelper.DATABASE_URL+'reviews')
+    .then(DBHelper.status)
+    .then(DBHelper.json)
+    .then(data => {
 
+        networkDataReceived = true;
+        console.log('Request succeeded with JSON response', data);
+        DBHelper.storeReviews(data);
+        return data;
+    }).catch(err => DBHelper.requestError(err));
+    
     // First try to get cached data from IndexedDB
     // TODO: move to service worker
     return await DBHelper.dbPromise.then( db => {
-
       const reviews = db.transaction('reviews')
         .objectStore('reviews');
-      
         
       return reviews.getAll();
 
@@ -296,15 +307,23 @@ static async storeRestaurants(restaurants){
         if(reviews.length > 0){
             return reviews.reverse();
         }else{
-            fetch(DBHelper.DATABASE_URL+'reviews')
-            .then(DBHelper.status)
-            .then(DBHelper.json)
-            .then(DBHelper.storeReviews)
-            .catch(err => DBHelper.requestError(err));
+          console.log('reviews array empty!');
+          throw Error("No data");
         }
-    });
-      
-    // After that get online data and put in IndexedDB
+    }).then( reviews => {
+        
+      if (!networkDataReceived) {
+          console.log('No Network Data Received!');
+          return reviews;
+      }else{
+          return networkUpdate;
+      }
+        
+    }).catch(function() {
+        console.log('getting there???');
+        
+      return networkUpdate;
+    }).catch(err => DBHelper.requestError(err));
 
   }
     
