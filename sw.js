@@ -73,11 +73,12 @@ self.addEventListener('fetch',  event => {
         event.respondWith(async function() {
             return await fetch(event.request);
         }());
-
+/*
         console.log(requestUrl.search);
-        
-        console.log(requestUrl.searchParams.get('is_favorite'));
-        
+        URLSearchParams.has('is_favorite'){
+            console.log(requestUrl.searchParams.get('is_favorite'));
+        }
+*/
     }else{
      event.respondWith(showCachedRestaurants(event.request));
     }
@@ -98,16 +99,19 @@ self.addEventListener('sync', event => {
   console.log('and were back online!');
   if (event.tag == 'reviews') {
       console.log('event tag: ', event.tag);
-      event.waitUntil(DBHelper.getQueuedReviews().then(reviews => {
-              console.log('Reviews from idb: ', reviews);
-              DBHelper.postReviews(reviews);
-          }).catch(error=> {
-            console.error('Error: ', error);
-          })
-      );
+      event.waitUntil(postQueuedReviews());
   }
 });
 
+
+postQueuedReviews = async () => {
+      return await DBHelper.getQueuedReviews().then(reviews => {
+          console.log('Reviews from idb: ', reviews);
+          DBHelper.postReviews(reviews);
+      }).catch(error=> {
+        console.error('Error: ', error);
+      });
+}
 
 
 function showCachedRestaurants(request){
