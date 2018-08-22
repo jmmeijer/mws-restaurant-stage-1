@@ -143,28 +143,16 @@ console.log('called fillRestaurantHTML!');
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-        //TODO: just for now, improve this later!
-        DBHelper.getReviewsByRestaurant(restaurant.id)
-        .then(reviews => {
-            console.log('first cached data');
-            self.restaurant.reviews = reviews.reverse();
-            resetReviewsHTML();
-            fillReviewsHTML();
-        })
-        .then( reviews => {
-            console.log('next... get live');
-             DBHelper.fetchReviewsByRestaurant(restaurant.id)
-            .then(reviews => {
-                self.restaurant.reviews = reviews.reverse();
-                resetReviewsHTML();
-                fillReviewsHTML();
-            })
-            .catch(err => DBHelper.requestError(err));
-            
-        })
-        .catch(err => DBHelper.requestError(err));
-        
-        //fillReviewsHTML();
+    //TODO: just for now, improve this later!
+    DBHelper.fetchReviewsByRestaurant(restaurant.id)
+    .then(reviews => {
+        self.restaurant.reviews = reviews.reverse();
+        resetReviewsHTML();
+        fillReviewsHTML();
+    })
+    .catch(err => DBHelper.requestError(err));
+
+    //fillReviewsHTML();
   // fill reviews
   //fillReviewsHTML();
   initFavorite();

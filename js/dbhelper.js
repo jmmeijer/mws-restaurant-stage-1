@@ -343,15 +343,41 @@ static async storeRestaurants(restaurants){
    */
   static async fetchReviewsByRestaurant(restaurant_id) {
     // TODO: race!!!
-    return await fetch(DBHelper.DATABASE_URL+'reviews/?restaurant_id=' + restaurant_id )
-        .then(DBHelper.status)
-        .then(DBHelper.json)
-        .then(DBHelper.storeReviews)
-        .then( reviews => {
-            self.restaurant.reviews = reviews;
-            return reviews;
-        })
-        .catch(err => DBHelper.requestError(err));
+    var networkDataReceived = false;
+      
+    const networkUpdate = await fetch(DBHelper.DATABASE_URL+'reviews/?restaurant_id=' + restaurant_id )
+    .then(DBHelper.status)
+    .then(DBHelper.json)
+    .then(data => {
+
+        networkDataReceived = true;
+
+        console.log('Request succeeded with JSON response', data);
+        DBHelper.storeReviews(data);
+        return data;
+    }).catch(err => DBHelper.requestError(err));
+      
+    return await DBHelper.getReviewsByRestaurant(restaurant_id).then( reviews => {
+        console.log('Reviews', reviews);
+        if(reviews.length > 0){
+            return reviews.reverse();
+        }else{
+          console.log('reviews array empty!');
+          throw Error("No data");
+        }
+    }).then( reviews => {
+        
+      if (!networkDataReceived) {
+          console.log('No Network Data Received!');
+          return reviews;
+      }else{
+          return networkUpdate;
+      }
+        
+    }).catch(function() {
+        console.log('getting there???');
+      return networkUpdate;
+    }).catch(err => DBHelper.requestError(err));
       
   }
     
