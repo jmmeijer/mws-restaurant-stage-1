@@ -100,15 +100,66 @@ self.addEventListener('sync', event => {
   if (event.tag == 'reviews') {
       console.log('event tag: ', event.tag);
       event.waitUntil(postQueuedReviews());
+      console.log('Finished Sync!');
   }
 });
 
 
 postQueuedReviews = async () => {
-      return await DBHelper.getQueuedReviews().then(reviews => {
-          console.log('Reviews from idb: ', reviews);
-          DBHelper.postReviews(reviews);
-      }).catch(error=> {
+  return await idb.open('restaurants', 3).then( db => {
+      const reviews = db.transaction('reviews')
+        .objectStore('reviews');
+        
+      return reviews.getAll();
+
+    }).then( reviews => {
+        console.log('Reviews', reviews);
+        if(reviews.length > 0){
+            return reviews;
+        }else{
+          console.log('reviews array empty!');
+          throw Error("No data");
+        }
+    })
+    .then( reviews => {
+        // Filter reviews by having synced attribute false
+        const results = reviews.filter(r => r.synced == false);
+      
+      console.log('Reviews that are not synced: ', results);
+      
+        return results;
+    }).catch(err => DBHelper.requestError(err))
+      .then(reviews => {
+      
+console.log('Reviews that are not synced: ', reviews);
+
+          reviews.map( async (review) => {
+            await DBHelper.postReview(review).then(review => {
+
+                console.log('Review has been posted: ', review);
+                
+            idb.open('restaurants', 2).then( db => {
+              if(!db) return;
+
+              const tx = db.transaction('reviews', 'readwrite');
+              const store = tx.objectStore('reviews');
+                
+                review.synced = true;
+                store.put(review);
+                
+                return review;
+                
+                }).then(review => {
+                    console.log('Review has been stored in idb: ', review);
+                });
+            });
+          });
+            
+        
+        return reviews;
+            
+      })
+      .catch(error=> {
         console.error('Error: ', error);
       });
 }

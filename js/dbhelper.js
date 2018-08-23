@@ -10,15 +10,18 @@ class DBHelper {
         return Promise.resolve();
       }
 
-      return idb.open('restaurants', 2, upgradeDb => {
+      return idb.open('restaurants', 3, upgradeDb => {
           switch(upgradeDb.oldVersion) {
             case 0:
               var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
               store.createIndex('cuisine', 'cuisine_type')
               store.createIndex('neighborhood', 'neighborhood');
             case 1:
-              var store = upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+              var store = upgradeDb.createObjectStore('reviews', { autoIncrement : true, keyPath: 'id' });
               store.createIndex('restaurant', 'restaurant_id')
+            case 2:
+              store = upgradeDb.transaction.objectStore('reviews');
+              store.createIndex('synced', 'synced');
           }
         });
     }
@@ -192,7 +195,6 @@ static async storeRestaurants(restaurants){
     return await DBHelper.fetchRestaurants().then(restaurants => {
       // Get all neighborhoods from all restaurants
       const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
-      console.log(neighborhoods);
       // Remove duplicates from neighborhoods
       const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
       return  uniqueNeighborhoods;
@@ -207,7 +209,6 @@ static async storeRestaurants(restaurants){
     return await DBHelper.fetchRestaurants().then(restaurants => {
       // Get all cuisines from all restaurants
       const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-      console.log(cuisines);
       // Remove duplicates from cuisines
       const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
       return uniqueCuisines;
@@ -280,7 +281,7 @@ static async storeRestaurants(restaurants){
 */
 
   static async getReviews() {
-    return await DBHelper.openDatabase().then( db => {
+    return await DBHelper.dbPromise.then( db => {
       const reviews = db.transaction('reviews')
         .objectStore('reviews');
         
@@ -437,11 +438,11 @@ static async storeFavorite(restaurant_id, is_favorite){
     }).catch(err => DBHelper.requestError(err));
 } 
     
-static async storeReview(review){
+static async storeReview(review, synced = false){
         // Check for Web Storage support
-    review.id = 0;
+    //review.id = 0;
     review.createdAt = new Date();
-    review.synced = false;
+    review.synced = synced;
     
     return await DBHelper.dbPromise.then( db => {
 
@@ -459,21 +460,24 @@ static async storeReview(review){
 * Get reviews from IDB with synced flag false if any
 */
   static async getQueuedReviews(){
-    return await DBHelper.getReviews()
-    .then( reviews => {
-        // Filter restaurants to have only given cuisine type
-        const results = reviews.filter(r => r.id == 0);
+    return await DBHelper.getReviews().then( reviews => {
+        // Filter reviews by having synced attribute false
+        const results = reviews.filter(r => r.synced == false);
         return results;
     }).catch(err => DBHelper.requestError(err));
   }
     
 static async postReviews(reviews) {
-console.log(reviews);
+    console.log('Reviews to be posted: ', reviews);
+    
     if(reviews.length > 0){
       reviews.map(
         review => DBHelper.postReview(review)
       );
     }
+    
+    return reviews;
+    
 }
     
     static clearReviews() {
