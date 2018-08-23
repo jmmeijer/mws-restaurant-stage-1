@@ -279,8 +279,10 @@ submitReview = async (review) => {
   }).then(() => {
     // Wait for the scoped service worker registration to get a
     // service worker with an active state
+      console.log('checking active service worker');
     return navigator.serviceWorker.ready;
   }).then(registration => {
+      console.log('next step');
     return registration.sync.register('reviews');
   }).then(() => {
     console.log('Sync registered!');

@@ -104,64 +104,48 @@ self.addEventListener('sync', event => {
   }
 });
 
+// https://developer.mozilla.org/en-US/docs/Web/API/IDBCursor/update
 
 postQueuedReviews = async () => {
-  return await idb.open('restaurants', 3).then( db => {
-      const reviews = db.transaction('reviews')
-        .objectStore('reviews');
+  return await idb.open('restaurants', 2).then( db => {
+      const tx = db.transaction('reviews', 'readwrite');
+      const store = tx.objectStore('reviews');
+      //const syncedIndex = store.index('synced');
         
-      return reviews.getAll();
+      return store.openCursor();
 
-    }).then( reviews => {
-        console.log('Reviews', reviews);
-        if(reviews.length > 0){
-            return reviews;
-        }else{
-          console.log('reviews array empty!');
-          throw Error("No data");
-        }
-    })
-    .then( reviews => {
-        // Filter reviews by having synced attribute false
-        const results = reviews.filter(r => r.synced == false);
+    }).then(async function syncReview(cursor) {
+      if (!cursor) return;
+      console.log('Cursor at: ', cursor.value);
+      console.log('Synced: ', cursor.value.synced);
       
-      console.log('Reviews that are not synced: ', results);
-      
-        return results;
-    }).catch(err => DBHelper.requestError(err))
-      .then(reviews => {
-      
-console.log('Reviews that are not synced: ', reviews);
+      if(cursor.value.synced === false){
+        var review = cursor.value;
+        console.log('This review has not been synced yet: ', review);
+        review.synced = true;
+          
+        DBHelper.postReview(review).then(syncedReview => {
+          console.log('Review has been posted: ', syncedReview);
 
-          reviews.map( async (review) => {
-            await DBHelper.postReview(review).then(review => {
-
-                console.log('Review has been posted: ', review);
-                
-            idb.open('restaurants', 2).then( db => {
-              if(!db) return;
-
-              const tx = db.transaction('reviews', 'readwrite');
-              const store = tx.objectStore('reviews');
-                
-                review.synced = true;
-                store.put(review);
-                
-                return review;
-                
-                }).then(review => {
-                    console.log('Review has been stored in idb: ', review);
-                });
-            });
-          });
-            
-        
-        return reviews;
-            
-      })
-      .catch(error=> {
-        console.error('Error: ', error);
-      });
+          return syncedReview;
+          //return cursor.continue().then(syncReview);
+        }).catch( error => {
+            console.error('Error: ', error.message);
+        });
+          
+        cursor.update(review).then(()=>{
+            console.log('Updated review in idb record');
+        }).catch( error => {
+            console.error('Error: ', error.message);
+        });
+      }
+      return cursor.continue().then(syncReview);
+    }).then(function() {
+      console.log('Done cursoring');
+      return 'done!';
+    }).catch(error=> {
+      console.error('Error: ', error.message);
+    });
 }
 
 

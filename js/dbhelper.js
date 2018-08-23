@@ -10,7 +10,7 @@ class DBHelper {
         return Promise.resolve();
       }
 
-      return idb.open('restaurants', 3, upgradeDb => {
+      return idb.open('restaurants', 2, upgradeDb => {
           switch(upgradeDb.oldVersion) {
             case 0:
               var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
@@ -18,10 +18,8 @@ class DBHelper {
               store.createIndex('neighborhood', 'neighborhood');
             case 1:
               var store = upgradeDb.createObjectStore('reviews', { autoIncrement : true, keyPath: 'id' });
-              store.createIndex('restaurant', 'restaurant_id')
-            case 2:
-              store = upgradeDb.transaction.objectStore('reviews');
-              store.createIndex('synced', 'synced');
+              store.createIndex('restaurant', 'restaurant_id');
+              //store.createIndex('synced', 'synced');
           }
         });
     }
