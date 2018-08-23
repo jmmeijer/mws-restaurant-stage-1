@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', event => {
     } else {
       console.log('Service workers are not supported.');
     }
-    
+/* We're doing this on the page
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
       navigator.serviceWorker.ready.then( registration => {
           
@@ -39,7 +39,7 @@ form.addEventListener('submit', event => {
     } else {
       console.log('Service workers and background sync are not supported.');
     }
-    
+*/
     window.addEventListener('online', showOffLine);
     window.addEventListener('offline', showOffLine);
     showOffLine();
@@ -84,7 +84,6 @@ resetNotification = () => {
 
 toggleFavorite = (restaurant) => {
     var state = restaurant.is_favorite;
-    console.log(state);
     
     //check in case is_favorite contains sting set to bool
     if(state === 'true'){
