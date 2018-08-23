@@ -94,17 +94,13 @@ class DBHelper {
       }
 
     }).then( restaurants => {
-        
       if (!networkDataReceived) {
           console.log('No Network Data Received!');
           return restaurants;
       }else{
           return networkUpdate;
       }
-        
     }).catch(function() {
-        console.log('getting there???');
-        
       return networkUpdate;
     }).catch(err => DBHelper.requestError(err));
   }
@@ -324,8 +320,6 @@ static async storeRestaurants(restaurants){
       }
         
     }).catch(function() {
-        console.log('getting there???');
-        
       return networkUpdate;
     }).catch(err => DBHelper.requestError(err));
 
@@ -378,7 +372,6 @@ static async storeRestaurants(restaurants){
       }
         
     }).catch(function() {
-        console.log('getting there???');
       return networkUpdate;
     }).catch(err => DBHelper.requestError(err));
       
@@ -437,7 +430,7 @@ static async storeFavorite(restaurant_id, is_favorite){
 } 
     
 static async storeReview(review, synced = false){
-        // Check for Web Storage support
+    // Check for Web Storage support
     //review.id = 0;
     review.createdAt = new Date();
     review.synced = synced;

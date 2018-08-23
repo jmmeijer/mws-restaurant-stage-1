@@ -65,22 +65,16 @@ initForm = (restaurant = self.restaurant) => {
 }
 
 initFavorite = (restaurant = self.restaurant) => {
-
     const favorite = document.getElementById('add-to-favorites');
-    
-    console.log('is_favorite?', restaurant.is_favorite);
-    
+    //console.log('is_favorite?', restaurant.is_favorite);
     if(restaurant.is_favorite == 'true'){
         favorite.classList.toggle("favorite");
     }
-    
     favorite.addEventListener('click', ()=>{
         toggleFavorite(restaurant);
         favorite.classList.toggle("favorite");
     }, false);
 }
-
-
 
 /**
  * Get current restaurant from page URL.
@@ -139,7 +133,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-    //TODO: just for now, improve this later!
     DBHelper.fetchReviewsByRestaurant(restaurant.id)
     .then(reviews => {
         self.restaurant.reviews = reviews.reverse();
@@ -148,9 +141,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     })
     .catch(err => DBHelper.requestError(err));
 
-    //fillReviewsHTML();
-  // fill reviews
-  //fillReviewsHTML();
   initFavorite();
   initForm();
 }

@@ -1,28 +1,9 @@
-importScripts('/js/idb.js');
-importScripts('/js/dbhelper.js');
+importScripts('./js/idb.js');
+importScripts('./js/dbhelper.js');
 
 var staticCacheName = 'rra-static-v1';
 var contentImgsCache = 'rra-content-imgs';
 var allCaches = [staticCacheName, contentImgsCache];
-
-/*
-function openDatabase() {
-  if (!navigator.serviceWorker) {
-    return Promise.resolve();
-  }
-
-  return idb.open('restaurants', 1, upgradeDb => {
-      switch(upgradeDb.oldVersion) {
-        case 0:
-          var store = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-          store.createIndex('cuisine', 'cuisine_type')
-          store.createIndex('neighborhood', 'neighborhood');
-      }
-    });
-}
-
-const dbPromise = openDatabase();
-*/
 
 self.addEventListener('install',  event => {
   event.waitUntil(caches.open(staticCacheName).then(function (cache) {
